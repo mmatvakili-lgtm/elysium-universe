@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elysium Universe</title>
+    <link
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- پاپ‌آپ هوشمند ادمین (بالای صفحه) -->
+    <div id="admin-top-notification" class="top-notification">
+      <div class="notif-content">
+        <i class="fa-solid fa-satellite-dish music-pulse text-orange"></i>
+        <div>
+          <h4 style="color: var(--orange-main); margin-bottom: 5px">
+            پژواک جدید دریافت شد!
+          </h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem">
+            یک پیام در بطری برایت ارسال شده است.
+          </p>
+        </div>
+      </div>
+      <button class="notif-close" onclick="closeAdminNotif()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <!-- لایه ستاره‌های تعاملی -->
+    <div id="particles-js"></div>
+
+    <!-- ================= صفحه ورود ================= -->
+    <div
+      id="login-page"
+      class="view-layer active-view"
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        position: relative;
+        z-index: 10;
+        perspective: 1000px;
+      "
+    >
+      <div class="login-ambient-light"></div>
+
+      <div class="login-box premium-glass-3d" id="login-card-3d">
+        <div class="holo-border"></div>
+
+        <div class="login-header">
+          <div id="user-persona-badge" class="persona-badge hidden-persona">
+            <i class="fa-solid fa-sparkles text-orange"></i>
+            <span id="persona-text">شناسایی کاربر...</span>
+          </div>
+
+          <div class="portal-ring">
+            <i class="fa-solid fa-infinity logo-icon-glow"></i>
+          </div>
+          <h1 class="logo-glow" style="font-size: 3rem; margin-bottom: 2px">
+            Elysium
+          </h1>
+          <p class="login-subtitle">دروازه اختصاصی کهکشانِ ما ✨</p>
+        </div>
+
+        <div class="login-form">
+          <div class="premium-input-group">
+            <input
+              type="text"
+              id="username"
+              required
+              autocomplete="off"
+              oninput="detectUserPersona(this.value)"
+            />
+            <label>کد کیهانی (نام کاربری)</label>
+            <i class="fa-solid fa-user-astronaut"></i>
+            <div class="input-border-glow"></div>
+          </div>
+
+          <div class="premium-input-group">
+            <input type="password" id="password" required autocomplete="off" />
+            <label>کلید قلب (رمز عبور)</label>
+            <i class="fa-solid fa-key"></i>
+            <button
+              type="button"
+              class="toggle-pass-btn"
+              onclick="togglePasswordVisibility()"
+            >
+              <i id="pass-eye-icon" class="fa-regular fa-eye"></i>
+            </button>
+            <div class="input-border-glow"></div>
+          </div>
+
+          <button class="btn-premium-login" onclick="attemptLogin()">
+            <span class="btn-text">گشودن دروازه</span>
+            <i
+              class="fa-solid fa-meteor btn-icon"
+              style="margin-right: 10px"
+            ></i>
+            <div class="btn-shine"></div>
+          </button>
+
+          <p id="login-error" class="error-msg"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= داشبورد اصلی ================= -->
+    <div id="main-dashboard" class="view-layer hidden-view">
+      <!-- بک‌دراپ تاریک برای منوی همبرگری -->
+      <div id="menu-backdrop" onclick="closeMenu()"></div>
+
+      <!-- منوی کشویی (Drawer Navigation) -->
+      <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+          <!-- 🔴 آیدی secret-logo اضافه شد و متن غیرقابل انتخاب شد تا با کلیکِ سریع، هایلایت نشود -->
+          <h2
+            class="text-orange"
+            id="secret-logo"
+            style="user-select: none; cursor: pointer"
+          >
+            Elysium
+          </h2>
+          <button class="close-menu-btn" onclick="closeMenu()">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <ul class="nav-links">
+          <li class="nav-item active" onclick="showSection('home', this)">
+            <i class="fa-solid fa-house"></i> <span>صفحه اصلی</span>
+          </li>
+          <li class="nav-item" onclick="showSection('letters', this)">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <span>صندوقچه نامه‌ها</span>
+          </li>
+          <li
+            class="nav-item"
+            id="nav-echo-btn"
+            onclick="showSection('echo', this)"
+          >
+            <i class="fa-solid fa-satellite-dish"></i> <span>پژواک کهکشان</span>
+          </li>
+          <li
+            class="nav-item"
+            id="nav-timecenter-btn"
+            onclick="showSection('timecenter', this)"
+          >
+            <i class="fa-solid fa-clock"></i> <span>مرکز زمان</span>
+          </li>
+          <li class="nav-item" onclick="showSection('gallery', this)">
+            <i class="fa-solid fa-images"></i> <span>گالری کهکشانی</span>
+          </li>
+          <li
+            class="nav-item"
+            id="nav-shrine-btn"
+            onclick="showSection('shrine', this)"
+          >
+            <i class="fa-solid fa-place-of-worship"></i>
+            <span>موزه یادگاری‌ها</span>
+          </li>
+          <li class="nav-item" onclick="showSection('profile', this)">
+            <i class="fa-solid fa-user-gear"></i> <span>تنظیمات پروفایل</span>
+          </li>
+          <li
+            class="nav-item"
+            id="nav-vault-btn"
+            onclick="showSection('vault', this)"
+          >
+            <i class="fa-solid fa-vault"></i> <span>گاوصندوق رازها</span>
+          </li>
+          <div id="admin-menu" class="hidden-view">
+            <!-- تب جدید استودیو نویسندگی -->
+            <li
+              class="nav-item"
+              id="nav-studio-btn"
+              onclick="showSection('studio', this)"
+            >
+              <i class="fa-solid fa-feather-pointed"></i>
+              <span>استودیو نویسندگی</span>
+            </li>
+            <li class="nav-item" onclick="showSection('admin-panel', this)">
+              <i class="fa-solid fa-shield-halved"></i> <span>پنل مدیریت</span>
+            </li>
+          </div>
+        </ul>
+        <div class="sidebar-footer">
+          <button class="btn-outline" onclick="logout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> خروج
+          </button>
+        </div>
+      </nav>
+
+      <!-- محتوای سمت راست -->
+      <main class="content-area">
+        <header class="topbar" style="justify-content: space-between">
+          <div style="display: flex; align-items: center; gap: 15px">
+            <button class="hamburger-btn" onclick="openMenu()">
+              <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+            <h1 id="page-title">صفحه اصلی</h1>
+          </div>
+
+          <div style="display: flex; gap: 10px">
+            <!-- نشانگر تلاقی ارواح -->
+            <div id="soul-sync-badge" class="hidden-view soul-badge">
+              <i class="fa-solid fa-heart-pulse"></i>
+              <span>او هم‌اکنون اینجاست...</span>
+            </div>
+            <!-- نشانگر کلید طلایی -->
+            <div
+              id="golden-key-badge"
+              class="hidden-view"
+              style="
+                background: rgba(255, 215, 0, 0.15);
+                border: 1px solid #ffd700;
+                padding: 6px 15px;
+                border-radius: 20px;
+                color: #ffd700;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+              "
+            >
+              <i class="fa-solid fa-key"></i>
+              <span id="key-count">۰ کلید طلایی</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="sections-container">
+          <!-- بخش ۱: صفحه اصلی -->
+          <section id="section-home" class="app-section active-section">
+            <div class="welcome-banner text-gradient">
+              <span id="typed-text"></span>
+            </div>
+            <!-- کادر هوشمند تونل زمان (توسط جاوااسکریپت پر می‌شود) -->
+            <div id="memory-lane-container"></div>
+            <div class="modules-grid">
+              <div
+                class="module-card border-orange"
+                onclick="showTodaysReason()"
+              >
+                <div class="card-icon text-orange">
+                  <i class="fa-solid fa-heart"></i>
+                </div>
+                <h3>چرا دوستت دارم؟</h3>
+                <p>دلیل امروز را ببین...</p>
+              </div>
+              <!-- تغییر اکشن و عنوان کارت -->
+              <div
+                class="module-card border-green"
+                onclick="
+                  showSection(
+                    'timecenter',
+                    document.getElementById('nav-timecenter-btn'),
+                  )
+                "
+              >
+                <div class="card-icon text-green">
+                  <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+                <h3>مرکز زمان</h3>
+                <p>تایم‌لاین و روزشمارهای ما...</p>
+              </div>
+              <div
+                class="module-card border-orange"
+                onclick="showRandomMemory()"
+              >
+                <div class="card-icon text-orange">
+                  <i class="fa-solid fa-images"></i>
+                </div>
+                <h3>صندوقچه خاطرات</h3>
+                <p>قاب‌های ماندگار ما</p>
+              </div>
+              <!-- تغییر onclick از showRandomSong به showSongsLibrary -->
+              <div
+                class="module-card border-green"
+                onclick="showSongsLibrary()"
+              >
+                <div class="card-icon text-green">
+                  <i class="fa-solid fa-music"></i>
+                </div>
+                <h3>آهنگ‌های ما</h3>
+                <p>پلی‌لیست عاشقانه (انتخابی و رندوم)</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- بخش ۲: نامه‌ها -->
+          <section id="section-letters" class="app-section hidden-section">
+            <div class="section-header" style="margin-bottom: 30px">
+              <h2
+                class="text-orange"
+                style="font-size: 1.8rem; margin-bottom: 5px"
+              >
+                صندوقچه نامه‌ها 💌
+              </h2>
+              <p style="color: var(--text-muted)">
+                حرف‌های نگفته و خاطراتی که برای همیشه ثبت می‌شوند...
+              </p>
+            </div>
+
+            <div id="letters-container" class="letters-grid"></div>
+          </section>
+
+          <!-- بخش ۳: پروفایل حرفه‌ای -->
+          <section id="section-profile" class="app-section hidden-section">
+            <div class="glass-panel profile-container">
+              <div class="profile-header">
+                <div class="avatar-circle">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <h2 class="text-green" id="profile-name">کاربر عزیز</h2>
+              </div>
+              <div class="profile-settings">
+                <h3 class="setting-title">تغییر رمز عبور</h3>
+                <div class="input-group">
+                  <i class="fa-solid fa-unlock-keyhole"></i>
+                  <input
+                    type="password"
+                    id="old-pass"
+                    placeholder="رمز عبور فعلی"
+                  />
+                </div>
+                <div class="input-group">
+                  <i class="fa-solid fa-key"></i>
+                  <input
+                    type="password"
+                    id="new-pass"
+                    placeholder="رمز عبور جدید"
+                  />
+                  <span class="password-strength" id="pass-strength"></span>
+                </div>
+                <div class="form-actions">
+                  <button class="btn-cancel" onclick="resetPasswordForm()">
+                    لغو
+                  </button>
+                  <button class="btn-save" onclick="changePassword()">
+                    ذخیره تغییرات
+                  </button>
+                </div>
+                <p id="password-msg" class="msg-box"></p>
+              </div>
+
+              <div class="profile-settings mt-4">
+                <h3 class="setting-title">نشست‌های فعال (Active Sessions)</h3>
+                <div class="session-card">
+                  <div>
+                    <i class="fa-solid fa-desktop text-green"></i>
+                    <span>همین دستگاه (Windows)</span>
+                  </div>
+                  <span class="status-badge">آنلاین</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="section-vault" class="app-section hidden-section">
+            <div class="vault-container glass-panel">
+              <i
+                id="vault-icon"
+                class="fa-solid fa-lock vault-icon text-orange"
+              ></i>
+              <h2
+                class="text-orange"
+                style="font-size: 2rem; margin-bottom: 10px"
+              >
+                گاوصندوق رازها
+              </h2>
+              <p style="color: var(--text-muted); margin-bottom: 30px">
+                برای دسترسی به محتوای این بخش، باید معمای زیر را حل کنی...
+              </p>
+
+              <div id="vault-challenge-area">
+                <div class="vault-question-box">
+                  <i class="fa-solid fa-circle-question text-orange"></i>
+                  <p id="vault-question-text">در حال بارگذاری معما...</p>
+                </div>
+
+                <div class="input-group" style="margin-top: 25px">
+                  <input
+                    type="text"
+                    id="vault-answer-input"
+                    class="glow-input text-center"
+                    placeholder="پاسخ معما را اینجا بنویس..."
+                    style="font-size: 1.1rem; padding: 15px"
+                  />
+                </div>
+
+                <p
+                  id="vault-msg"
+                  style="height: 20px; font-size: 0.9rem; margin-bottom: 15px"
+                ></p>
+                <button class="btn-gradient" onclick="attemptUnlockVault()">
+                  <i class="fa-solid fa-key"></i> بررسی و باز کردن قفل
+                </button>
+              </div>
+
+              <div
+                id="vault-revealed-area"
+                class="hidden-view"
+                style="
+                  margin-top: 20px;
+                  border-top: 1px solid var(--green-main);
+                  padding-top: 20px;
+                "
+              >
+                <h3 class="text-green" style="margin-bottom: 15px">
+                  قفل باز شد! ✨
+                </h3>
+                <div
+                  id="vault-secret-content"
+                  style="
+                    color: var(--text-main);
+                    line-height: 2;
+                    font-size: 1.1rem;
+                    text-align: right;
+                    background: rgba(0, 0, 0, 0.4);
+                    padding: 20px;
+                    border-radius: 15px;
+                  "
+                ></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- بخش جدید و مستقل: استودیو نویسندگی -->
+          <section id="section-studio" class="app-section hidden-section">
+            <div class="section-header" style="margin-bottom: 25px">
+              <h2 class="text-green" style="font-size: 1.8rem">
+                استودیو نویسندگی ✍️
+              </h2>
+              <p style="color: var(--text-muted)">
+                فضایی آرام برای نوشتن حرف‌های نگفته...
+              </p>
+            </div>
+
+            <div class="glass-panel" style="padding: 30px">
+              <div class="input-group">
+                <i class="fa-solid fa-heading"></i>
+                <input type="text" id="letter-title" placeholder="عنوان نامه" />
+              </div>
+              <div class="input-group" style="margin-bottom: 20px">
+                <textarea
+                  id="letter-content"
+                  class="modern-textarea"
+                  placeholder="متن نامه را اینجا بنویس..."
+                ></textarea>
+              </div>
+              <div
+                style="
+                  background: rgba(0, 0, 0, 0.3);
+                  padding: 15px;
+                  border-radius: 12px;
+                  margin-bottom: 25px;
+                  border: 1px solid var(--border-light);
+                "
+              >
+                <h4
+                  class="text-orange"
+                  style="margin-bottom: 15px; font-size: 1rem"
+                >
+                  <i class="fa-solid fa-bell"></i> تنظیمات اطلاع‌رسانی
+                </h4>
+                <select
+                  id="letter-notif-type"
+                  onchange="toggleScheduleInput()"
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    border-radius: 10px;
+                    background: rgba(0, 0, 0, 0.5);
+                    border: 1px solid var(--border-light);
+                    color: white;
+                  "
+                >
+                  <option value="normal">
+                    🔔 ارسال فوری (ارسال نوتیف در تلگرام همین الان)
+                  </option>
+                  <option value="silent">
+                    🔕 ارسال بی‌صدا (ثبت در صندوقچه بدون پیام)
+                  </option>
+                  <option value="scheduled">
+                    ⏳ ارسال زمان‌دار (نوتیفیکیشن در زمان مشخص)
+                  </option>
+                </select>
+                <div
+                  id="schedule-container"
+                  style="display: none; margin-top: 10px"
+                >
+                  <label style="font-size: 0.9rem; color: var(--text-muted)"
+                    >زمان دقیق ارسال نوتیفیکیشن:</label
+                  >
+                  <input
+                    type="datetime-local"
+                    id="letter-schedule-time"
+                    style="
+                      width: 100%;
+                      padding: 12px;
+                      border-radius: 10px;
+                      background: rgba(0, 0, 0, 0.5);
+                      border: 1px solid var(--green-main);
+                      color: white;
+                    "
+                  />
+                </div>
+
+                <div
+                  style="
+                    margin-top: 20px;
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    padding-top: 15px;
+                  "
+                >
+                  <h4
+                    class="text-orange"
+                    style="margin-bottom: 15px; font-size: 1rem"
+                  >
+                    <i class="fa-solid fa-lock"></i> کپسول زمان (قفل کردن نامه)
+                  </h4>
+                  <label style="font-size: 0.9rem; color: var(--text-muted)"
+                    >تاریخ و ساعت باز شدن قفل (خالی بگذارید تا نامه باز
+                    باشد):</label
+                  >
+                  <input
+                    type="datetime-local"
+                    id="letter-unlock-date"
+                    class="glow-input"
+                    style="margin-top: 8px"
+                  />
+                </div>
+              </div>
+              <div class="form-actions" style="justify-content: space-between">
+                <p id="admin-msg" class="msg-box" style="margin: 0"></p>
+                <div style="display: flex; gap: 10px">
+                  <button class="btn-cancel" onclick="clearLetterForm()">
+                    پاک کردن
+                  </button>
+                  <button class="btn-save" onclick="submitLetter()">
+                    انتشار نامه
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- بخش ۴: مرکز فرماندهی (Admin Panel) -->
+          <section id="section-admin-panel" class="app-section hidden-section">
+            <div class="section-header" style="margin-bottom: 25px">
+              <h2 class="text-green" style="font-size: 1.8rem">
+                مرکز فرماندهی ⚙️
+              </h2>
+              <p style="color: var(--text-muted)">
+                مدیریت جامع تمام محتوای سیستم و دیتابیس
+              </p>
+            </div>
+
+            <!-- تب‌های مدیریت (تب استودیو حذف و مدیریت نامه‌ها فعال شد) -->
+            <div class="admin-tabs">
+              <button
+                class="admin-tab active"
+                onclick="switchAdminTab('letters-mgr', event)"
+              >
+                💌 مدیریت نامه‌ها
+              </button>
+              <button
+                class="admin-tab"
+                onclick="switchAdminTab('events-mgr', event)"
+              >
+                ⏳ روزشمار
+              </button>
+              <button
+                class="admin-tab"
+                onclick="switchAdminTab('memories-mgr', event)"
+              >
+                📸 خاطرات
+              </button>
+              <button
+                class="admin-tab"
+                onclick="switchAdminTab('echoes-mgr', event)"
+              >
+                📡 پژواک‌ها
+              </button>
+              <button
+                class="admin-tab"
+                onclick="switchAdminTab('songs-mgr', event)"
+              >
+                🎵 آهنگ‌ها
+              </button>
+              <button
+                class="admin-tab"
+                onclick="switchAdminTab('vault-mgr', event)"
+              >
+                🔐 گاوصندوق
+              </button>
+            </div>
+
+            <!-- تب مدیریت نامه‌ها (اکنون تب پیش‌فرض و فعال است) -->
+            <div
+              id="admin-tab-letters-mgr"
+              class="admin-content-pane active-pane glass-panel"
+            >
+              <h3 class="text-orange" style="margin-bottom: 20px">
+                لیست نامه‌های ثبت شده
+              </h3>
+              <div id="admin-letters-list" class="admin-list-container"></div>
+            </div>
+
+            <!-- تب ۳: مدیریت روزشمار -->
+            <div
+              id="admin-tab-events-mgr"
+              class="admin-content-pane hidden-pane glass-panel"
+            >
+              <h3 class="text-orange" style="margin-bottom: 20px">
+                افزودن تاریخ جدید
+              </h3>
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  flex-wrap: wrap;
+                  margin-bottom: 25px;
+                "
+              >
+                <input
+                  type="text"
+                  id="new-event-date"
+                  class="glow-input"
+                  placeholder="تاریخ (1402/05/16)"
+                  style="flex: 1"
+                />
+                <input
+                  type="text"
+                  id="new-event-title"
+                  class="glow-input"
+                  placeholder="عنوان رویداد"
+                  style="flex: 2"
+                />
+                <!-- دکمه جدید با شناسه btn-save-event و تابع submitEvent -->
+                <button
+                  id="btn-save-event"
+                  class="btn-save"
+                  onclick="submitEvent()"
+                >
+                  ثبت تاریخ
+                </button>
+              </div>
+              <h3 class="text-green" style="margin-bottom: 15px">
+                تاریخ‌های ثبت شده
+              </h3>
+              <div id="admin-events-list" class="admin-list-container"></div>
+            </div>
+
+            <!-- تب ۴: مدیریت خاطرات (ارتقا یافته با فرم ویرایش) -->
+            <div
+              id="admin-tab-memories-mgr"
+              class="admin-content-pane hidden-pane glass-panel"
+            >
+              <h3 class="text-orange" style="margin-bottom: 20px">
+                کنترل پنل کهکشان 🌌
+              </h3>
+
+              <!-- فرم مخفی ویرایش سیاره -->
+              <div
+                id="memory-edit-form"
+                style="
+                  display: none;
+                  background: rgba(0, 0, 0, 0.4);
+                  padding: 20px;
+                  border-radius: 15px;
+                  border: 1px solid var(--orange-main);
+                  margin-bottom: 25px;
+                  box-shadow: 0 0 20px rgba(249, 123, 34, 0.1);
+                "
+              >
+                <input type="hidden" id="edit-mem-id" />
+                <div class="input-group">
+                  <select
+                    id="edit-mem-cat"
+                    class="glow-input"
+                    style="padding-right: 15px"
+                  >
+                    <option value="عاشقانه">❤️ عاشقانه</option>
+                    <option value="خنده‌دار">😂 خنده‌دار</option>
+                    <option value="دلتنگی">🥺 دلتنگی</option>
+                    <option value="روزمره">🌟 روزمره</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    id="edit-mem-date"
+                    class="glow-input"
+                    placeholder="تاریخ ثبت (مثلاً 1402/05/16)"
+                  />
+                </div>
+                <div class="input-group">
+                  <textarea
+                    id="edit-mem-desc"
+                    class="modern-textarea"
+                    style="min-height: 100px; padding: 15px"
+                    placeholder="داستان این سیاره را بنویس..."
+                  ></textarea>
+                </div>
+                <div
+                  style="display: flex; gap: 10px; justify-content: flex-end"
+                >
+                  <button class="btn-cancel" onclick="closeMemoryEdit()">
+                    انصراف
+                  </button>
+                  <button class="btn-save" onclick="submitMemoryEdit()">
+                    <i class="fa-solid fa-check"></i> ذخیره تغییرات
+                  </button>
+                </div>
+              </div>
+
+              <h3
+                class="text-green"
+                style="margin-bottom: 15px; font-size: 1.1rem"
+              >
+                لیست تمام سیاره‌ها
+              </h3>
+              <div id="admin-memories-list" class="admin-list-container"></div>
+            </div>
+
+            <!-- تب ۵: مدیریت آهنگ‌ها -->
+            <div
+              id="admin-tab-songs-mgr"
+              class="admin-content-pane hidden-pane glass-panel"
+            >
+              <h3 class="text-orange" style="margin-bottom: 20px">
+                مدیریت پلی‌لیست
+              </h3>
+              <div id="admin-songs-list" class="admin-list-container"></div>
+            </div>
+
+            <!-- تب ۷: مدیریت پژواک‌ها -->
+            <div
+              id="admin-tab-echoes-mgr"
+              class="admin-content-pane hidden-pane glass-panel"
+            >
+              <h3 class="text-orange" style="margin-bottom: 20px">
+                رادار کهکشان (پیام‌های دریافتی) 📡
+              </h3>
+              <div id="admin-echoes-list" class="admin-list-container"></div>
+            </div>
+
+            <div
+              id="admin-tab-vault-mgr"
+              class="admin-content-pane hidden-pane glass-panel"
+            >
+              <h3 class="text-orange" style="margin-bottom: 20px">
+                تنظیمات گاوصندوق رازها 🔐
+              </h3>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="admin-vault-q"
+                  class="glow-input"
+                  placeholder="سوال / معما (مثلاً: اولین هدیه‌ای که برام گرفتی؟)"
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="admin-vault-a"
+                  class="glow-input"
+                  placeholder="پاسخ دقیق (مثلاً: ساعت)"
+                />
+              </div>
+              <div class="input-group">
+                <textarea
+                  id="admin-vault-c"
+                  class="modern-textarea"
+                  style="min-height: 150px; padding: 15px"
+                  placeholder="محتوای مخفی که بعد از باز شدن قفل نمایش داده می‌شود..."
+                ></textarea>
+              </div>
+              <button
+                class="btn-save"
+                style="width: 100%"
+                onclick="saveAdminVault()"
+              >
+                <i class="fa-solid fa-floppy-disk"></i> ذخیره تنظیمات گاوصندوق
+              </button>
+            </div>
+          </section>
+
+          <!-- بخش جدید: موزه یادگاری‌های مقدس -->
+          <section id="section-shrine" class="app-section hidden-section">
+            <div class="shrine-gallery">
+              <!-- یادگاری اول: کش موی مشکی با هاله نقره‌ای -->
+              <div class="shrine-item" onclick="openShrineItem('hairtie')">
+                <div class="shrine-icon-wrapper">
+                  <i
+                    class="fa-solid fa-ring shrine-icon"
+                    style="
+                      color: #1a1a1a;
+                      filter: drop-shadow(0 0 12px rgba(226, 232, 240, 0.9))
+                        drop-shadow(0 0 3px #fff);
+                    "
+                  ></i>
+                </div>
+                <div
+                  class="shrine-pedestal"
+                  style="--pedestal-color: rgba(226, 232, 240, 0.6)"
+                ></div>
+                <h3>کش موی مقدس</h3>
+              </div>
+
+              <!-- یادگاری دوم: بوسه کاغذی (ایموجی 💋) -->
+              <div class="shrine-item" onclick="openShrineItem('kiss')">
+                <div class="shrine-icon-wrapper">
+                  <span
+                    class="shrine-icon emoji-icon"
+                    style="filter: drop-shadow(0 0 15px rgba(255, 77, 77, 0.8))"
+                    >💋</span
+                  >
+                </div>
+                <div
+                  class="shrine-pedestal"
+                  style="--pedestal-color: rgba(255, 77, 77, 0.6)"
+                ></div>
+                <h3>بوسه کاغذی</h3>
+              </div>
+
+              <!-- یادگاری سوم: ساعت زمان -->
+              <div class="shrine-item" onclick="openShrineItem('watch')">
+                <div class="shrine-icon-wrapper">
+                  <i
+                    class="fa-solid fa-stopwatch shrine-icon"
+                    style="
+                      color: #ffd700;
+                      filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+                    "
+                  ></i>
+                </div>
+                <div
+                  class="shrine-pedestal"
+                  style="--pedestal-color: rgba(255, 215, 0, 0.6)"
+                ></div>
+                <h3>ساعت زمان</h3>
+              </div>
+
+              <!-- یادگاری چهارم: کتونی سفید -->
+              <div class="shrine-item" onclick="openShrineItem('sneakers')">
+                <div class="shrine-icon-wrapper">
+                  <i
+                    class="fa-solid fa-shoe-prints shrine-icon"
+                    style="
+                      color: #ffffff;
+                      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+                    "
+                  ></i>
+                </div>
+                <div
+                  class="shrine-pedestal"
+                  style="--pedestal-color: rgba(255, 255, 255, 0.6)"
+                ></div>
+                <h3>کتونی سفید تولد</h3>
+              </div>
+            </div>
+          </section>
+
+          <!-- بخش ۵: گالری کهکشانی (جدید) -->
+          <section id="section-gallery" class="app-section hidden-section">
+            <div class="section-header" style="margin-bottom: 25px">
+              <h2 class="text-orange" style="font-size: 1.8rem">
+                گالری کهکشانی 🌌
+              </h2>
+              <p style="color: var(--text-muted)">
+                آرشیوی از قاب‌های ماندگار و لحظه‌های ما...
+              </p>
+            </div>
+
+            <!-- فیلترهای هوشمند -->
+            <div class="gallery-filters" id="gallery-filters">
+              <button
+                class="filter-btn active"
+                onclick="filterGallery('all', event)"
+              >
+                همه خاطرات
+              </button>
+              <button
+                class="filter-btn"
+                onclick="filterGallery('عاشقانه', event)"
+              >
+                ❤️ عاشقانه
+              </button>
+              <button
+                class="filter-btn"
+                onclick="filterGallery('خنده‌دار', event)"
+              >
+                😂 خنده‌دار
+              </button>
+              <button
+                class="filter-btn"
+                onclick="filterGallery('دلتنگی', event)"
+              >
+                🥺 دلتنگی
+              </button>
+              <button
+                class="filter-btn"
+                onclick="filterGallery('روزمره', event)"
+              >
+                🌟 روزمره
+              </button>
+            </div>
+
+            <!-- محفظه لودینگ و عکس‌ها -->
+            <div class="masonry-gallery" id="gallery-container"></div>
+          </section>
+          <!-- بخش ۶: مرکز زمان (تایم‌لاین و روزشمار پیشرفته) -->
+          <section id="section-timecenter" class="app-section hidden-section">
+            <div class="section-header" style="margin-bottom: 25px">
+              <h2 class="text-green" style="font-size: 1.8rem">مرکز زمان ⏳</h2>
+              <p style="color: var(--text-muted)">
+                مختصات دقیق لحظه‌هایی که با هم گذراندیم و در پیش داریم...
+              </p>
+            </div>
+
+            <div class="timecenter-grid">
+              <!-- ستون راست/بالا: تایم‌لاین گرافی -->
+              <div class="tc-timeline-box glass-panel">
+                <h3
+                  class="text-orange"
+                  style="text-align: center; margin-bottom: 30px"
+                >
+                  <i class="fa-solid fa-route"></i> نقشه راه عشق ما
+                </h3>
+                <div
+                  id="tc-timeline-container"
+                  class="timeline-container"
+                ></div>
+              </div>
+
+              <!-- ستون چپ/پایین: موتورهای شمارشگر -->
+              <div class="tc-counters-box">
+                <!-- شمارشگر سالانه (مانده) -->
+                <div class="glass-panel" style="margin-bottom: 20px">
+                  <h3 class="text-green" style="margin-bottom: 20px">
+                    <i class="fa-solid fa-calendar-day"></i> رویدادهای پیش‌رو
+                    (هر سال)
+                  </h3>
+                  <div id="tc-annual-container" class="counters-list"></div>
+                </div>
+                <!-- شمارشگر زمان سپری شده (گذشته) -->
+                <div class="glass-panel">
+                  <h3 class="text-orange" style="margin-bottom: 20px">
+                    <i class="fa-solid fa-clock-rotate-left"></i> زمان‌های سپری
+                    شده
+                  </h3>
+                  <div id="tc-elapsed-container" class="counters-list"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- بخش ۸: پژواک کهکشان (ارسال پیام) -->
+          <section id="section-echo" class="app-section hidden-section">
+            <div class="vault-container glass-panel" style="max-width: 700px">
+              <i
+                class="fa-solid fa-bottle-droplet text-green"
+                style="font-size: 4rem; margin-bottom: 20px"
+              ></i>
+              <h2
+                class="text-green"
+                style="font-size: 1.8rem; margin-bottom: 10px"
+              >
+                پیامی در بطری
+              </h2>
+              <p style="color: var(--text-muted); margin-bottom: 30px">
+                حرفی در دل داری؟ بنویس یا صدایت را ضبط کن تا در بی‌نهایتِ کهکشان
+                به دستش برسد...
+              </p>
+
+              <!-- تب‌های انتخاب متن یا صدا -->
+              <div
+                class="admin-tabs"
+                style="justify-content: center; margin-bottom: 25px"
+              >
+                <button
+                  class="admin-tab active"
+                  onclick="switchEchoMode('text', this)"
+                >
+                  <i class="fa-solid fa-keyboard"></i> پیام متنی
+                </button>
+                <button
+                  class="admin-tab"
+                  onclick="switchEchoMode('voice', this)"
+                >
+                  <i class="fa-solid fa-microphone"></i> پیام صوتی
+                </button>
+              </div>
+
+              <!-- حالت متنی -->
+              <div id="echo-text-mode">
+                <textarea
+                  id="echo-text-input"
+                  class="modern-textarea"
+                  style="min-height: 150px; text-align: right"
+                  placeholder="حرف‌هایت را اینجا بنویس..."
+                ></textarea>
+                <button class="btn-gradient" onclick="sendEchoText()">
+                  <i class="fa-solid fa-paper-plane"></i> رها کردن در فضا
+                </button>
+              </div>
+
+              <!-- حالت صوتی -->
+              <div
+                id="echo-voice-mode"
+                style="display: none; text-align: center; padding: 20px 0"
+              >
+                <div
+                  id="recording-indicator"
+                  style="
+                    display: none;
+                    color: #ff4d4d;
+                    margin-bottom: 15px;
+                    font-weight: bold;
+                  "
+                >
+                  <i class="fa-solid fa-circle text-orange music-pulse"></i> در
+                  حال ضبط صدا... <span id="record-timer">00:00</span>
+                </div>
+                <button
+                  id="btn-record-toggle"
+                  class="play-pause-btn"
+                  style="
+                    width: 80px;
+                    height: 80px;
+                    font-size: 2.5rem;
+                    margin: 0 auto 20px;
+                  "
+                  onclick="toggleRecording()"
+                >
+                  <i class="fa-solid fa-microphone"></i>
+                </button>
+                <p id="echo-voice-status" class="text-muted">
+                  برای شروع ضبط کلیک کن
+                </p>
+                <button
+                  id="btn-send-voice"
+                  class="btn-gradient"
+                  style="display: none"
+                  onclick="sendEchoVoice()"
+                >
+                  <i class="fa-solid fa-paper-plane"></i> ارسال صدای ضبط شده
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- ================= لایه Overlay و Modal (طراحی جدید) ================= -->
+    <div
+      id="overlay-backdrop"
+      class="hidden-view"
+      onclick="closeDetail()"
+    ></div>
+    <div id="modal-container" class="hidden-view">
+      <div class="detail-content glass-panel">
+        <button class="close-modal-btn" onclick="closeDetail()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2 id="detail-title" class="text-orange"></h2>
+        <div id="detail-body"></div>
+      </div>
+    </div>
+
+    <!-- ================= کتاب سینماتیک نامه‌ها ================= -->
+    <div id="cinematic-reader" class="hidden-view">
+      <div class="glass-book">
+        <button class="close-book-btn" onclick="closeCinematicReader()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="book-header">
+          <h2 id="book-title"></h2>
+          <span id="book-author"></span>
+        </div>
+        <div class="book-content">
+          <p id="book-page-text"></p>
+        </div>
+
+        <div class="book-footer">
+          <button
+            id="btn-next-page"
+            class="book-nav"
+            onclick="changeBookPage(1)"
+          >
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+
+          <!-- واکنش‌های چندگانه -->
+          <div class="book-actions" id="partner-actions">
+            <button
+              class="btn-romantic-action"
+              onclick="sendReaction('heart', this)"
+            >
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <button
+              class="btn-romantic-action"
+              onclick="sendReaction('hug', this)"
+            >
+              <i class="fa-solid fa-hands-holding"></i>
+            </button>
+            <button
+              class="btn-romantic-action"
+              onclick="sendReaction('cry', this)"
+            >
+              <i class="fa-regular fa-face-sad-cry"></i>
+            </button>
+          </div>
+
+          <span id="book-page-indicator">صفحه ۱ از ۱</span>
+
+          <button
+            id="btn-prev-page"
+            class="book-nav"
+            onclick="changeBookPage(-1)"
+          >
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+        </div>
+
+        <!-- اتمسفر صوتی اختصاصی و آرام‌بخش -->
+        <audio id="ambient-sound" loop preload="auto" crossorigin="anonymous">
+          <source
+            src="https://rico6.pythonanywhere.com/relax.mp3"
+            type="audio/mpeg"
+          />
+        </audio>
+      </div>
+    </div>
+
+    <!-- ================= موتور گلوبال موزیک (پلیر فیکس پایین صفحه) ================= -->
+    <div id="global-mini-player" class="hidden-player" dir="ltr">
+      <div class="mini-player-glass">
+        <div class="mini-player-info" dir="rtl">
+          <i class="fa-solid fa-music text-green music-pulse"></i>
+          <span id="mini-player-title">در حال بارگذاری...</span>
+        </div>
+
+        <div class="mini-player-controls">
+          <button class="control-btn" onclick="prevGlobalSong()">
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+          <button class="play-pause-btn" onclick="toggleGlobalPlay()">
+            <i id="global-play-icon" class="fa-solid fa-pause"></i>
+          </button>
+          <button class="control-btn" onclick="nextGlobalSong()">
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+        </div>
+
+        <div class="mini-player-actions">
+          <button
+            id="like-btn"
+            class="control-btn like-btn"
+            onclick="toggleGlobalLike()"
+          >
+            <i class="fa-regular fa-heart"></i>
+          </button>
+          <span id="global-time-display" class="time-display">0:00 / 0:00</span>
+        </div>
+      </div>
+      <div
+        class="global-progress-container"
+        id="global-progress-container"
+        onclick="seekGlobalAudio(event)"
+      >
+        <div class="global-progress-bar" id="global-progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- کتابخانه‌ها -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
