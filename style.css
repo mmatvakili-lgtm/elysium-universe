@@ -468,7 +468,6 @@ body {
 .sidebar {
   position: fixed;
   right: 0;
-  transform: translateX(100%);
   top: 0;
   width: 280px;
   height: 100dvh;
@@ -479,13 +478,12 @@ body {
   z-index: 200;
   display: flex;
   flex-direction: column;
+  transform: translateX(100%);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  /* 🔴 اضافه‌شده برای رفعِ قطعیِ بیرون‌زدگی متن در راست‌چین */
   box-sizing: border-box;
-  padding-right: 0;
 }
 .sidebar.open {
-  transform: translateX(0); /* منو را به داخل صفحه برمی‌گرداند */
+  transform: translateX(0);
 }
 .sidebar-header {
   display: flex;
@@ -2211,21 +2209,32 @@ body.night-owl-theme {
 /* ================= رفع قطعی مشکلات رسپانسیو و موبایل ================= */
 @media (max-width: 768px) {
   /* 🔴 اصلاح منوی کناری (جلوگیری از بیرون زدن متن) */
+  /* 🔴 اصلاح قطعی پهنا و چیدمان منوی کشویی در موبایل */
   .sidebar {
-    width: 75%;
-    max-width: 300px;
+    width: 240px !important;
+    max-width: 80vw !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(100%);
+  }
+  .sidebar.open {
+    transform: translateX(0) !important;
+  }
+  .nav-links {
+    padding: 15px 10px !important;
+    direction: rtl !important;
   }
   .nav-item {
-    white-space: normal;
-    padding: 12px 10px !important;
+    padding: 10px 12px !important;
+    gap: 12px !important;
   }
   .nav-item span {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 170px;
-    font-size: 0.95rem;
+    display: inline-block !important;
+    white-space: nowrap !important;
+    font-size: 0.9rem !important;
+    max-width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   /* 🔴 کوچک شدن هدر و فونت‌های اصلی */
