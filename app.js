@@ -66,19 +66,39 @@ function attemptLogin() {
     errorMsg.innerText = "فیلدها را کامل کنید.";
     return;
   }
-  errorMsg.innerText = "در حال احراز هویت... ⏳";
+  errorMsg.innerText = "در حال اسکن شبکه و احراز هویت... ⏳";
 
   fetch(BASE_URL + "/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username: userVal, password: passVal }),
   })
-    .then((res) => res.json())
+    .then(async (res) => {
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(
+          `خطای HTTP ${res.status}: ${errText.substring(0, 150)}`,
+        );
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const errText = await res.text();
+        throw new Error(
+          `سرور JSON برنگرداند! خروجی: ${errText.substring(0, 100)}`,
+        );
+      }
+      return res.json();
+    })
     .then((data) => {
       if (data.status === "success") {
         localStorage.setItem("elysium_user", userVal);
-        document.getElementById("profile-name").innerText =
-          userVal === "matin" ? "متین عزیز" : "مطهره جان";
+
+        // 🔴 اصلاح شده: استفاده از فیلد جدید پروفایل بدون ارور نال
+        const nameInput = document.getElementById("display-name-input");
+        if (nameInput && !nameInput.value) {
+          nameInput.value = userVal === "matin" ? "متین عزیز" : "مطهره جان";
+        }
+
         document
           .getElementById("login-page")
           .classList.replace("active-view", "hidden-view");
@@ -88,27 +108,38 @@ function attemptLogin() {
 
         if (data.role === "admin") {
           document.getElementById("admin-menu").classList.remove("hidden-view");
-          // 🔴 روشن کردن رادار ادمین بلافاصله پس از لاگین دستی
           if (typeof startAdminRadar === "function") startAdminRadar();
         }
         loadLetters();
         checkNightOwlMode();
         startSoulSyncPing();
         checkSkyMirrorWeather();
-        initConstellationMinigame(); // اجرای مینی‌گیم مخفی
+        initConstellationMinigame();
       } else {
         errorMsg.innerText = data.message;
       }
     })
-    .catch(() => (errorMsg.innerText = "❌ خطا در اتصال به سرور"));
+    .catch((err) => {
+      console.error("🚨 جزئیات کامل خطای شبکه:", err);
+      let faError = err.message;
+      if (err.message.includes("Failed to fetch")) {
+        faError =
+          "مرورگر اجازه اتصال نمی‌دهد (مشکل CORS یا در دسترس نبودن سرور).";
+      }
+      errorMsg.innerText = "❌ خطا: " + faError;
+    });
 }
 
 // ================= ورود خودکار و هوشمند (Auto-Login) =================
 document.addEventListener("DOMContentLoaded", () => {
   const user = localStorage.getItem("elysium_user");
   if (user) {
-    document.getElementById("profile-name").innerText =
-      user === "matin" ? "متین عزیز" : "مطهره جان";
+    // 🔴 اصلاح شده: بررسی ایمن المنت جدید پروفایل
+    const nameInput = document.getElementById("display-name-input");
+    if (nameInput && !nameInput.value) {
+      nameInput.value = user === "matin" ? "متین عزیز" : "مطهره جان";
+    }
+
     document
       .getElementById("login-page")
       .classList.replace("active-view", "hidden-view");
@@ -118,14 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (user === "matin") {
       document.getElementById("admin-menu").classList.remove("hidden-view");
-      // 🔴 روشن کردن رادار در ورود خودکار
       if (typeof startAdminRadar === "function") startAdminRadar();
     }
     loadLetters();
     checkNightOwlMode();
     startSoulSyncPing();
     checkSkyMirrorWeather();
-    initConstellationMinigame(); // اجرای مینی‌گیم مخفی
+    initConstellationMinigame();
   }
 });
 
