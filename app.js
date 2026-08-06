@@ -9,18 +9,18 @@ particlesJS("particles-js", {
     opacity: {
       value: 0.3,
       random: true,
-      anim: { enable: true, speed: 0.5, opacity_min: 0.25, sync: false },
+      anim: { enable: true, speed: 0.5, opacity_min: 0.35, sync: false },
     } /* 🔴 کم‌نور */,
     size: {
-      value: 2.2,
+      value: 2.5,
       random: true,
-      anim: { enable: true, speed: 1, size_min: 1.3, sync: false },
+      anim: { enable: true, speed: 1, size_min: 1.6, sync: false },
     } /* 🔴 کمی بزرگ‌تر طبق درخواست */,
     line_linked: {
       enable: true,
       distance: 150,
       color: "#ffffff",
-      opacity: 0.28,
+      opacity: 0.4,
       width: 1,
     },
     move: {
@@ -1866,19 +1866,46 @@ function loadMemoryLane() {
         const timeText = d.date
           ? `مربوط به تاریخ ${d.date}`
           : `در دسته‌بندی ${d.category}`;
+
+        // 🔴 اصلاح شد: onclick به کلِ کادر منتقل شد تا هرجای کارت کلیک کرد کار کند
         container.innerHTML = `
-            <div class="memory-lane-card" style="position:relative;">
-                <!-- 🔴 دکمه بستن -->
+            <div class="memory-lane-card" style="position:relative; cursor:pointer;" onclick="openMemoryLaneCard(event, ${d.id})">
+                <!-- دکمه بستن -->
                 <button onclick="closeMemoryLane(event)" style="position:absolute; left:15px; top:15px; background:none; border:none; color:var(--text-muted); font-size:1.2rem; z-index:10;"><i class="fa-solid fa-times"></i></button>
                 
-                <div class="memory-lane-icon" onclick="viewMediaFull(${d.id})"><i class="fa-solid fa-meteor"></i></div>
-                <div class="memory-lane-text" onclick="viewMediaFull(${d.id})">
+                <div class="memory-lane-icon"><i class="fa-solid fa-meteor"></i></div>
+                <div class="memory-lane-text">
                     <h3>یادت هست؟ ✨</h3>
                     <p>یک قاب ماندگار ${timeText} از دل کهکشان پیدا شد... کلیک کن.</p>
                 </div>
             </div>`;
       }
     });
+}
+
+// ================= رفع مشکل کلیک روی کارت شهاب‌سنگ و ستاره‌ها =================
+function openMemoryLaneCard(e, id) {
+  // 🔴 جلوگیری از انتقال کلیک به پس‌زمینه و ساخته شدن ستاره‌های مزاحم
+  if (e) e.stopPropagation();
+
+  // اگر آرایه خاطرات خالی بود (یعنی گالری هنوز در پس‌زمینه لود نشده)
+  if (allMemories.length === 0) {
+    // تغییر موقت شفافیت کارت برای نشان دادن حالت بارگذاری
+    e.currentTarget.style.opacity = "0.5";
+
+    fetch(BASE_URL + "/api/gallery_memories")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.status === "success") {
+          allMemories = data.data;
+          viewMediaFull(id); // حالا با خیال راحت خاطره را باز کن
+          e.currentTarget.style.opacity = "1";
+        }
+      });
+  } else {
+    // اگر قبلاً لود شده بود، مستقیم بازش کن
+    viewMediaFull(id);
+  }
 }
 
 function closeMemoryLane(e) {
