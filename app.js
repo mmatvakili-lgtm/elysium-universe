@@ -3,33 +3,33 @@ const BASE_URL = "https://rico6.pythonanywhere.com";
 // ================= تنظیمات پیشرفته ستاره‌ها =================
 particlesJS("particles-js", {
   particles: {
-    number: { value: 60, density: { enable: true, value_area: 800 } },
-    color: { value: ["#f1f0c8"] },
+    number: { value: 50, density: { enable: true, value_area: 800 } },
+    color: { value: ["#f4f3ca"] },
     shape: { type: "circle" },
     opacity: {
-      value: 0.5,
+      value: 0.3,
       random: true,
-      anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false },
-    } /* 🔴 کم‌نورتر شد */,
+      anim: { enable: true, speed: 0.5, opacity_min: 0.25, sync: false },
+    } /* 🔴 کم‌نور */,
     size: {
-      value: 1.5,
+      value: 2.2,
       random: true,
-      anim: { enable: true, speed: 2, size_min: 0.5, sync: false },
-    } /* 🔴 بسیار ریز و ظریف شد */,
+      anim: { enable: true, speed: 1, size_min: 1.3, sync: false },
+    } /* 🔴 کمی بزرگ‌تر طبق درخواست */,
     line_linked: {
       enable: true,
-      distance: 120,
+      distance: 150,
       color: "#ffffff",
-      opacity: 0.15,
+      opacity: 0.28,
       width: 1,
-    } /* 🔴 خطوط نامحسوس‌تر شد */,
+    },
     move: {
       enable: true,
-      speed: 0.8,
+      speed: 0.6,
       direction: "none",
       random: true,
       out_mode: "out",
-    },
+    } /* 🔴 سرعت بسیار آرام */,
   },
   interactivity: {
     detect_on: "window",
@@ -39,7 +39,7 @@ particlesJS("particles-js", {
       resize: true,
     },
     modes: {
-      bubble: { distance: 150, size: 3, duration: 2, opacity: 0.8 },
+      bubble: { distance: 150, size: 3, duration: 2, opacity: 0.5 },
       push: { particles_nb: 2 },
     },
   },
@@ -155,8 +155,25 @@ function closeMenu() {
 }
 
 // ================= مسیریابی و داشبورد (SPA Routing) =================
-function showSection(sectionId, element) {
-  // 🔴 مدیریت هوشمند دکمه بازگشت (اگر صفحه اصلی نباشد، دکمه بازگشت ظاهر می‌شود)
+// ================= سیستم مسیریابی و دکمه بازگشت =================
+let navigationHistory = ["home"];
+
+function goBack() {
+  if (navigationHistory.length > 1) {
+    navigationHistory.pop(); // حذف صفحه فعلی
+    const prevSection = navigationHistory[navigationHistory.length - 1];
+    showSection(prevSection, null, true);
+  }
+}
+
+function showSection(sectionId, element, isBack = false) {
+  if (
+    !isBack &&
+    sectionId !== navigationHistory[navigationHistory.length - 1]
+  ) {
+    navigationHistory.push(sectionId);
+  }
+
   const backBtn = document.getElementById("global-back-btn");
   if (backBtn) {
     if (sectionId === "home")
@@ -164,24 +181,20 @@ function showSection(sectionId, element) {
     else backBtn.classList.replace("hidden-view", "active-view");
   }
 
-  // ۱. آپدیت استایل دکمه‌های منو
   document
     .querySelectorAll(".nav-item")
     .forEach((el) => el.classList.remove("active"));
   if (element) element.classList.add("active");
 
-  // ۲. پنهان کردن تمام صفحات
   document.querySelectorAll(".app-section").forEach((sec) => {
     sec.classList.remove("active-section");
     sec.classList.add("hidden-section");
   });
 
-  // ۳. نمایش صفحه هدف با انیمیشن
   const target = document.getElementById("section-" + sectionId);
   target.classList.remove("hidden-section");
   setTimeout(() => target.classList.add("active-section"), 50);
 
-  // ۴. تغییر عنوان بالای صفحه
   const titles = {
     home: "صفحه اصلی",
     letters: "صندوقچه نامه‌ها",
@@ -192,20 +205,17 @@ function showSection(sectionId, element) {
     timecenter: "مرکز زمان ⏳",
     vault: "گاوصندوق رازها 🔐",
     echo: "پژواک کهکشان 📡",
-    shrine: "موزه یادگاری‌های مقدس 🏛️", // 🔴 اضافه شد
+    shrine: "موزه یادگاری‌های مقدس 🏛️",
   };
   document.getElementById("page-title").innerText = titles[sectionId] || "";
 
-  // ۵. لود کردن دیتای مخصوص هر بخش
   if (sectionId === "letters") loadLetters();
   if (sectionId === "gallery") loadGallery();
   if (sectionId === "timecenter") loadTimeCenter();
   if (sectionId === "vault") loadVaultQuestion();
   if (sectionId === "home") loadMemoryLane();
-  if (sectionId === "echo")
-    document.getElementById("echo-text-input").value = "";
+  if (sectionId === "profile") loadProfileData(); // 🔴 لود اطلاعات پروفایل
 
-  // ۶. بستن منو (حذف شرط سایز صفحه تا همیشه بسته شود)
   closeMenu();
 }
 
@@ -1806,20 +1816,16 @@ function viewMediaFull(id) {
   openModal(`کاوش در سیاره ${m.category} 🚀`, contentHtml);
 }
 
-// الگوریتم یادآوری هوشمند (On This Day / Memory Lane)
-// ================= الگوریتم یادآوری خودکار (Memory Lane) =================
+// ================= الگوریتم یادآوری خودکار (تایم‌گیت) =================
 function loadMemoryLane() {
   const container = document.getElementById("memory-lane-container");
   if (!container) return;
 
-  // اطمینان از اینکه دیتای کل گالری به صورت خاموش لود شده است
-  // تا وقتی کاربر روی کادر کلیک کرد، تابع viewMediaFull بتواند سیاره را پیدا کند
-  if (typeof allMemories !== "undefined" && allMemories.length === 0) {
-    fetch(BASE_URL + "/api/gallery_memories")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.status === "success") allMemories = d.data;
-      });
+  // بررسی زمان آخرین باری که بسته شده (مثلاً ۱۲ ساعت)
+  const lastClosed = localStorage.getItem("elysium_memory_closed");
+  if (lastClosed && Date.now() - parseInt(lastClosed) < 12 * 60 * 60 * 1000) {
+    container.innerHTML = "";
+    return;
   }
 
   fetch(BASE_URL + "/api/memory_lane")
@@ -1831,16 +1837,24 @@ function loadMemoryLane() {
           ? `مربوط به تاریخ ${d.date}`
           : `در دسته‌بندی ${d.category}`;
         container.innerHTML = `
-                    <div class="memory-lane-card" onclick="viewMediaFull(${d.id})">
-                        <div class="memory-lane-icon"><i class="fa-solid fa-meteor"></i></div>
-                        <div class="memory-lane-text">
-                            <h3>یادت هست؟ ✨</h3>
-                            <p>یک قاب ماندگار ${timeText} از دل کهکشان پیدا شد... روی این شهاب‌سنگ کلیک کن تا سیاره‌اش را دوباره کاوش کنیم.</p>
-                        </div>
-                    </div>
-                `;
+            <div class="memory-lane-card" style="position:relative;">
+                <!-- 🔴 دکمه بستن -->
+                <button onclick="closeMemoryLane(event)" style="position:absolute; left:15px; top:15px; background:none; border:none; color:var(--text-muted); font-size:1.2rem; z-index:10;"><i class="fa-solid fa-times"></i></button>
+                
+                <div class="memory-lane-icon" onclick="viewMediaFull(${d.id})"><i class="fa-solid fa-meteor"></i></div>
+                <div class="memory-lane-text" onclick="viewMediaFull(${d.id})">
+                    <h3>یادت هست؟ ✨</h3>
+                    <p>یک قاب ماندگار ${timeText} از دل کهکشان پیدا شد... کلیک کن.</p>
+                </div>
+            </div>`;
       }
     });
+}
+
+function closeMemoryLane(e) {
+  e.stopPropagation();
+  document.getElementById("memory-lane-container").innerHTML = "";
+  localStorage.setItem("elysium_memory_closed", Date.now()); // ذخیره زمان بسته شدن
 }
 
 // برای اینکه دقیقاً لحظه‌ی لاگین هم تونل زمان لود شود，
@@ -2515,6 +2529,11 @@ function initConstellationMinigame() {
   const homeSection = document.getElementById("section-home");
   if (!homeSection) return;
 
+  // 🔴 بررسی زمان آخرین حل شدن (۲۴ ساعت)
+  const lastSolved = localStorage.getItem("elysium_constellation_solved");
+  if (lastSolved && Date.now() - parseInt(lastSolved) < 24 * 60 * 60 * 1000)
+    return;
+
   // ایجاد یک بوم (Canvas) روی صفحه اصلی برای کشیدن خطوط
   let canvas = document.getElementById("constellation-canvas");
   if (!canvas) {
@@ -2650,6 +2669,7 @@ function constellationReward() {
       .querySelectorAll(".constellation-star")
       .forEach((s) => s.classList.remove("connected"));
     connectedStars = 0;
+    localStorage.setItem("elysium_constellation_solved", Date.now()); // 🔴 زمان‌بندی مجدد
   }, 10000);
 }
 
@@ -3063,15 +3083,127 @@ function openShrineItem(type) {
     }
   }
 });
+*/
 
-// تابع اختصاصی برای بستن موزه و قطع صدای اتمسفر
 function closeShrineOverlay() {
   const overlay = document.getElementById("shrine-cinematic-overlay");
   if (overlay) overlay.remove();
-
-  // قطع کردن صدای رازآلود موزه
   if (window.shrineAudio) {
     window.shrineAudio.pause();
     window.shrineAudio.currentTime = 0;
   }
-}*/
+}
+
+// ================= موتور پیشرفته پروفایل و نشست‌ها =================
+let currentUserSessionId = localStorage.getItem("elysium_session_id");
+if (!currentUserSessionId) {
+  currentUserSessionId = "sess_" + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem("elysium_session_id", currentUserSessionId);
+}
+
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
+  let device = "دستگاه ناشناس";
+  if (/Mobile|Android|iP(hone|od)/i.test(ua)) device = "📱 موبایل";
+  else if (/Tablet|iPad/i.test(ua)) device = "💊 تبلت";
+  else device = "💻 دسکتاپ";
+
+  let browser = "مرورگر";
+  if (/Chrome/i.test(ua)) browser = "Chrome";
+  else if (/Safari/i.test(ua)) browser = "Safari";
+  else if (/Firefox/i.test(ua)) browser = "Firefox";
+
+  return { device, browser };
+}
+
+function loadProfileData() {
+  const user = localStorage.getItem("elysium_user");
+  if (!user) return;
+
+  // لود اطلاعات عکس و نام
+  fetch(BASE_URL + `/api/profile/info/${user}`)
+    .then((r) => r.json())
+    .then((data) => {
+      if (data.status === "success") {
+        if (data.display_name)
+          document.getElementById("display-name-input").value =
+            data.display_name;
+        if (data.avatar)
+          document.getElementById("user-avatar-img").src = data.avatar;
+      }
+    });
+
+  // لود نشست‌های واقعی
+  const deviceInfo = getDeviceInfo();
+  fetch(BASE_URL + "/api/sessions/ping", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: user,
+      device: deviceInfo.device,
+      browser: deviceInfo.browser,
+      session_id: currentUserSessionId,
+    }),
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      if (data.status === "success") {
+        const cont = document.getElementById("active-sessions-list");
+        cont.innerHTML = data.sessions
+          .map(
+            (s) => `
+                <div class="session-item">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <i class="fa-solid fa-mobile-screen-button text-muted" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <span style="display:block; color:var(--text-main); font-weight:bold; font-size:0.95rem;">${s.device} - ${s.browser}</span>
+                            <span style="display:block; color:var(--text-muted); font-size:0.75rem;"><i class="fa-regular fa-clock"></i> ${s.last_seen}</span>
+                        </div>
+                    </div>
+                    ${s.is_current ? '<span class="status-badge" style="background:var(--green-main); color:#000;">همین دستگاه</span>' : ""}
+                </div>
+            `,
+          )
+          .join("");
+      }
+    });
+}
+
+function handleAvatarUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    document.getElementById("user-avatar-img").src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProfileInfo() {
+  const user = localStorage.getItem("elysium_user");
+  const dName = document.getElementById("display-name-input").value;
+  const avatar = document.getElementById("user-avatar-img").src;
+
+  const btn = document.querySelector("#section-profile .btn-save");
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+  fetch(BASE_URL + "/api/profile/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: user,
+      display_name: dName,
+      avatar: avatar,
+    }),
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> ذخیره شد';
+      setTimeout(
+        () =>
+          (btn.innerHTML =
+            '<i class="fa-solid fa-floppy-disk"></i> بروزرسانی مشخصات'),
+        2000,
+      );
+    });
+}

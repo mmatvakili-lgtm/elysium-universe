@@ -8,9 +8,9 @@
     />
     <!-- 🔴 جلوگیری از زوم شدن ناخواسته در موبایل -->
     <title>Elysium Universe</title>
-    <!-- 🔴 فونت فوق‌حرفه‌ای و مدرن یکان‌بخ که در اپلیکیشن‌های برتر استفاده می‌شود -->
+    <!-- 🔴 فونت شبنم (Shabnam) - یکی از خواناترین و مدرن‌ترین فونت‌های وب فارسی -->
     <link
-      href="https://cdn.jsdelivr.net/gh/rastikerdar/yekan-bakh@v0.2.0/fonts/yekan-bakh-faNum.css"
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css"
       rel="stylesheet"
       type="text/css"
     />
@@ -209,17 +209,18 @@
             <button class="hamburger-btn" onclick="openMenu()">
               <i class="fa-solid fa-bars-staggered"></i>
             </button>
-            <!-- 🔴 دکمه بازگشت به صفحه اصلی (به صورت پیش‌فرض مخفی) -->
+            <!-- 🔴 دکمه بازگشت سراسری -->
             <button
               id="global-back-btn"
               class="hidden-view"
-              onclick="showSection('home', document.querySelector('.nav-item'))"
+              onclick="goBack()"
               style="
                 background: none;
                 border: none;
                 color: var(--text-main);
-                font-size: 1.2rem;
+                font-size: 1.3rem;
                 cursor: pointer;
+                padding: 5px;
               "
             >
               <i class="fa-solid fa-arrow-right"></i>
@@ -332,53 +333,124 @@
             <div id="letters-container" class="letters-grid"></div>
           </section>
 
-          <!-- بخش ۳: پروفایل حرفه‌ای -->
+          <!-- بخش ۳: پروفایل حرفه‌ای و فنی -->
           <section id="section-profile" class="app-section hidden-section">
-            <div class="glass-panel profile-container">
-              <div class="profile-header">
-                <div class="avatar-circle">
-                  <i class="fa-solid fa-user"></i>
+            <div class="section-header" style="margin-bottom: 25px">
+              <h2 class="text-green" style="font-size: 1.8rem">
+                مدیریت حساب کاربری ⚙️
+              </h2>
+            </div>
+
+            <div class="profile-container">
+              <!-- کارت مشخصات فردی -->
+              <div class="profile-adv-card">
+                <h3 class="setting-title">
+                  <i class="fa-solid fa-id-badge text-orange"></i> مشخصات فردی
+                </h3>
+                <div class="profile-header-new">
+                  <div
+                    class="avatar-wrapper"
+                    onclick="document.getElementById('avatar-upload').click()"
+                  >
+                    <img
+                      id="user-avatar-img"
+                      src="https://via.placeholder.com/100/10b981/000000?text=+"
+                      alt="Avatar"
+                      style="
+                        width: 90px;
+                        height: 90px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        border: 2px solid var(--green-main);
+                      "
+                    />
+                    <div class="avatar-edit-overlay">
+                      <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <input
+                      type="file"
+                      id="avatar-upload"
+                      accept="image/*"
+                      style="display: none"
+                      onchange="handleAvatarUpload(event)"
+                    />
+                  </div>
+                  <div style="flex-grow: 1">
+                    <label style="font-size: 0.85rem; color: var(--text-muted)"
+                      >نام نمایشی:</label
+                    >
+                    <input
+                      type="text"
+                      id="display-name-input"
+                      class="glow-input"
+                      placeholder="نام خود را وارد کنید..."
+                      style="
+                        margin-top: 5px;
+                        font-weight: bold;
+                        font-size: 1.1rem;
+                      "
+                    />
+                  </div>
                 </div>
-                <h2 class="text-green" id="profile-name">کاربر عزیز</h2>
+                <button
+                  class="btn-save"
+                  style="width: 100%; margin-top: 15px"
+                  onclick="saveProfileInfo()"
+                >
+                  <i class="fa-solid fa-floppy-disk"></i> بروزرسانی مشخصات
+                </button>
               </div>
-              <div class="profile-settings">
-                <h3 class="setting-title">تغییر رمز عبور</h3>
+
+              <!-- کارت امنیت -->
+              <div class="profile-adv-card">
+                <h3 class="setting-title">
+                  <i class="fa-solid fa-shield-halved text-green"></i> امنیت و
+                  رمز عبور
+                </h3>
                 <div class="input-group">
-                  <i class="fa-solid fa-unlock-keyhole"></i>
-                  <input
+                  <i class="fa-solid fa-unlock-keyhole"></i
+                  ><input
                     type="password"
                     id="old-pass"
                     placeholder="رمز عبور فعلی"
                   />
                 </div>
                 <div class="input-group">
-                  <i class="fa-solid fa-key"></i>
-                  <input
+                  <i class="fa-solid fa-key"></i
+                  ><input
                     type="password"
                     id="new-pass"
                     placeholder="رمز عبور جدید"
                   />
-                  <span class="password-strength" id="pass-strength"></span>
                 </div>
-                <div class="form-actions">
-                  <button class="btn-cancel" onclick="resetPasswordForm()">
-                    لغو
-                  </button>
-                  <button class="btn-save" onclick="changePassword()">
-                    ذخیره تغییرات
-                  </button>
-                </div>
-                <p id="password-msg" class="msg-box"></p>
+                <p
+                  id="password-msg"
+                  class="msg-box"
+                  style="margin-bottom: 10px"
+                ></p>
+                <button
+                  class="btn-outline"
+                  style="
+                    border-color: var(--green-main);
+                    color: var(--green-main);
+                  "
+                  onclick="changePassword()"
+                >
+                  <i class="fa-solid fa-lock"></i> تغییر رمز عبور
+                </button>
               </div>
 
-              <div class="profile-settings mt-4">
-                <h3 class="setting-title">نشست‌های فعال (Active Sessions)</h3>
-                <div class="session-card">
-                  <div>
-                    <i class="fa-solid fa-desktop text-green"></i>
-                    <span>همین دستگاه (Windows)</span>
-                  </div>
-                  <span class="status-badge">آنلاین</span>
+              <!-- کارت نشست‌های فعال -->
+              <div class="profile-adv-card">
+                <h3 class="setting-title">
+                  <i class="fa-solid fa-network-wired text-orange"></i>
+                  دستگاه‌های متصل (Sessions)
+                </h3>
+                <div id="active-sessions-list">
+                  <p class="text-muted text-center" style="font-size: 0.9rem">
+                    <i class="fa-solid fa-spinner fa-spin"></i> در حال اسکن
+                    شبکه...
+                  </p>
                 </div>
               </div>
             </div>

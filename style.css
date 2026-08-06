@@ -19,7 +19,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Yekan Bakh", sans-serif; /* 🔴 فونت تغییر کرد */
+  font-family: "Shabnam", sans-serif; /* 🔴 فونت خواناتر و زیباتر */
   outline: none;
 }
 
@@ -2153,94 +2153,171 @@ body.night-owl-theme {
   z-index: 3;
 }
 
+/* ================= استایل‌های پیشرفته پروفایل ================= */
+.profile-adv-card {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-light);
+  border-radius: 18px;
+  padding: 25px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+}
+.profile-header-new {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.avatar-wrapper {
+  position: relative;
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.avatar-edit-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: 0.3s;
+}
+.avatar-wrapper:hover .avatar-edit-overlay {
+  opacity: 1;
+}
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
 /* ================= رفع قطعی مشکلات رسپانسیو و موبایل ================= */
 @media (max-width: 768px) {
+  /* 🔴 اصلاح منوی کناری (جلوگیری از بیرون زدن متن) */
   .sidebar {
     width: 75%;
     max-width: 300px;
   }
+  .nav-item {
+    white-space: normal;
+    padding: 12px 10px !important;
+  }
+  .nav-item span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 170px;
+    font-size: 0.95rem;
+  }
 
-  /* 🔴 کوچک شدن هدر و قرارگیری در یک خط */
+  /* 🔴 کوچک شدن هدر و فونت‌های اصلی */
+  .topbar {
+    padding: 0 15px;
+  }
   .topbar h1 {
-    font-size: 1.05rem !important;
+    font-size: 1.1rem !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 150px;
   }
   .welcome-banner {
-    min-height: 60px !important;
-    margin-bottom: 20px !important;
+    min-height: 50px !important;
+    margin-bottom: 15px !important;
   }
   #typed-text {
-    font-size: 1.3rem !important;
+    font-size: 1.25rem !important;
     line-height: 1.4 !important;
     white-space: nowrap;
-  } /* 🔴 قرارگیری در یک خط */
+  }
 
+  /* 🔴 دو ستونه شدن ماژول‌ها و تنظیم دقیق سایزها */
   .modules-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+    gap: 10px !important;
   }
   .module-card {
-    padding: 15px 10px !important;
-    border-radius: 14px !important;
+    padding: 12px 8px !important;
+    border-radius: 12px !important;
   }
   .card-icon {
-    font-size: 1.6rem !important;
-    margin-bottom: 8px !important;
+    font-size: 1.4rem !important;
+    margin-bottom: 6px !important;
   }
   .module-card h3 {
-    font-size: 0.85rem !important;
+    font-size: 0.8rem !important;
+    margin-bottom: 2px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .module-card p {
-    font-size: 0.65rem !important;
-    line-height: 1.4 !important;
+    font-size: 0.6rem !important;
+    line-height: 1.3 !important;
   }
 
+  /* 🔴 ظریف‌سازی موزه یادگاری‌ها */
   .shrine-gallery {
-    gap: 15px !important;
+    gap: 10px !important;
   }
   .shrine-item {
     width: 45% !important;
   }
   .shrine-icon-wrapper {
-    height: 90px !important;
-    padding-bottom: 10px !important;
+    height: 75px !important;
+    padding-bottom: 5px !important;
   }
   .shrine-icon {
-    font-size: 3rem !important;
+    font-size: 2.2rem !important;
   }
   .emoji-icon {
-    font-size: 3.5rem !important;
+    font-size: 2.8rem !important;
   }
   .shrine-pedestal {
-    width: 90px !important;
-    height: 90px !important;
-    bottom: 25px !important;
+    width: 70px !important;
+    height: 70px !important;
+    bottom: 20px !important;
   }
   .shrine-item h3 {
-    font-size: 0.8rem !important;
-    margin-top: 10px !important;
+    font-size: 0.75rem !important;
+    margin-top: 5px !important;
   }
 
-  .premium-glass-3d {
-    padding: 30px 20px !important;
-    width: 92% !important;
-    margin: 30px auto !important;
+  /* 🔴 رفع تداخل استودیو نویسندگی و موزیک پلیر */
+  #global-mini-player {
+    width: 95%;
+    bottom: 15px;
+    padding: 8px 15px;
   }
-  .login-header h1 {
-    font-size: 2rem !important;
-  }
-  #login-page {
-    align-items: flex-start !important;
-    padding-top: 5vh !important;
-  }
+  .has-active-player .sections-container {
+    padding-bottom: 140px !important;
+  } /* باز کردن فضا برای دکمه انتشار */
 }
 
-/* 🔴 مدیریت تداخل موزیک پلیر با دکمه‌های پایین صفحه (مثل استودیو) */
-.has-active-player .sections-container {
-  padding-bottom: 90px !important; /* فضا باز می‌شود تا دکمه انتشار زیر پلیر نماند */
+/* 🔴 تنظیمات اختصاصی صورت فلکی و ستاره‌ها (کم‌نور و ریز) */
+.constellation-star {
+  width: 4px !important;
+  height: 4px !important;
+  margin-top: -2px;
+  margin-left: -2px;
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+  animation: twinkle 5s infinite alternate;
+}
+.constellation-star::after {
+  content: "";
+  position: absolute;
+  top: -30px;
+  left: -30px;
+  right: -30px;
+  bottom: -30px;
 }
