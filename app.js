@@ -2851,20 +2851,26 @@ function togglePasswordVisibility() {
   }
 }
 
-// ۳. افکت چرخش سه‌بعدی (3D Tilt) با حرکت موس
+// ۳. افکت چرخش سه‌بعدی (هوشمند شده برای دسکتاپ و موبایل)
 document.addEventListener("DOMContentLoaded", () => {
   const card = document.getElementById("login-card-3d");
   const container = document.getElementById("login-page");
 
   if (card && container) {
     container.addEventListener("mousemove", (e) => {
+      // 🔴 شاه‌کلید حل لگ: اگر کاربر در موبایل است یا صفحه لمسی دارد، افکت سه‌بعدی را غیرفعال کن
+      if (window.innerWidth <= 768 || "ontouchstart" in window) {
+        card.style.transform = "rotateX(0deg) rotateY(0deg)";
+        return;
+      }
+
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
 
       // محاسبه زوایای چرخش
-      const rotateX = (-y / rect.height) * 18; // چرخش عمودی
-      const rotateY = (x / rect.width) * 18; // چرخش افقی
+      const rotateX = (-y / rect.height) * 18;
+      const rotateY = (x / rect.width) * 18;
 
       card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
@@ -2872,6 +2878,15 @@ document.addEventListener("DOMContentLoaded", () => {
     container.addEventListener("mouseleave", () => {
       card.style.transform = "rotateX(0deg) rotateY(0deg)";
     });
+  }
+});
+
+// ۴. رفع باگ از کار افتادن ستاره‌ها در حالت دسکتاپ موبایل (Desktop Site)
+window.addEventListener("resize", () => {
+  const canvas = document.querySelector("#particles-js canvas");
+  if (canvas) {
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
   }
 });
 
