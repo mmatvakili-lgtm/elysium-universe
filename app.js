@@ -3,32 +3,31 @@ const BASE_URL = "https://rico6.pythonanywhere.com";
 // ================= تنظیمات پیشرفته ستاره‌ها =================
 particlesJS("particles-js", {
   particles: {
-    number: { value: 70, density: { enable: true, value_area: 800 } },
-    color: { value: ["#eaeac0"] },
+    number: { value: 60, density: { enable: true, value_area: 800 } },
+    color: { value: ["#f1f0c8"] },
     shape: { type: "circle" },
     opacity: {
-      value: 1.4,
+      value: 0.5,
       random: true,
-      anim: { enable: true, speed: 1, opacity_min: 0.3, sync: false },
-    },
+      anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false },
+    } /* 🔴 کم‌نورتر شد */,
     size: {
-      value: 4,
+      value: 1.5,
       random: true,
-      anim: { enable: true, speed: 2, size_min: 2, sync: false },
-    },
+      anim: { enable: true, speed: 2, size_min: 0.5, sync: false },
+    } /* 🔴 بسیار ریز و ظریف شد */,
     line_linked: {
       enable: true,
-      distance: 140,
+      distance: 120,
       color: "#ffffff",
-      opacity: 0.3,
+      opacity: 0.15,
       width: 1,
-    },
+    } /* 🔴 خطوط نامحسوس‌تر شد */,
     move: {
       enable: true,
-      speed: 0.6 /* 🔴 سرعت کمی بیشتر شد تا حرکتشان کاملاً محسوس باشد */,
+      speed: 0.8,
       direction: "none",
       random: true,
-      straight: false,
       out_mode: "out",
     },
   },
@@ -37,14 +36,14 @@ particlesJS("particles-js", {
     events: {
       onhover: { enable: true, mode: "bubble" },
       onclick: { enable: true, mode: "push" },
-      resize: true /* 🔴 وادار کردن سیستم به ری‌فرش هنگام تغییر حالت به Desktop */,
+      resize: true,
     },
     modes: {
-      bubble: { distance: 180, size: 8, duration: 2, opacity: 1 },
-      push: { particles_nb: 3 },
+      bubble: { distance: 150, size: 3, duration: 2, opacity: 0.8 },
+      push: { particles_nb: 2 },
     },
   },
-  retina_detect: false /* 🔴 خاموش کردن این گزینه باعث می‌شود در حالت Desktop Site موبایل، بومِ ستاره‌ها فریز نشود */,
+  retina_detect: false,
 });
 
 // افکت تایپ
@@ -157,6 +156,14 @@ function closeMenu() {
 
 // ================= مسیریابی و داشبورد (SPA Routing) =================
 function showSection(sectionId, element) {
+  // 🔴 مدیریت هوشمند دکمه بازگشت (اگر صفحه اصلی نباشد، دکمه بازگشت ظاهر می‌شود)
+  const backBtn = document.getElementById("global-back-btn");
+  if (backBtn) {
+    if (sectionId === "home")
+      backBtn.classList.replace("active-view", "hidden-view");
+    else backBtn.classList.replace("hidden-view", "active-view");
+  }
+
   // ۱. آپدیت استایل دکمه‌های منو
   document
     .querySelectorAll(".nav-item")
@@ -638,13 +645,16 @@ function playGlobalSong(index) {
 
   document.getElementById("mini-player-title").innerText = song.title;
   document.getElementById("global-play-icon").className = "fa-solid fa-pause";
-  document.getElementById("global-mini-player").classList.add("active-player"); // نمایش پلیر شناور
+  document.getElementById("global-mini-player").classList.add("active-player");
   document
     .getElementById("global-mini-player")
     .classList.remove("hidden-player");
 
+  // 🔴 اضافه کردن کلاس به body تا پایین تمام صفحات (مثل استودیو) برای پلیر جا باز شود
+  document.body.classList.add("has-active-player");
+
   updateGlobalLikeButton();
-  renderPlaylistUI(); // آپدیت رنگ آهنگ در لیست (اگر لیست باز باشد)
+  renderPlaylistUI();
 }
 
 function toggleGlobalPlay() {
@@ -726,6 +736,19 @@ function seekGlobalAudio(e) {
   let percent = (e.clientX - rect.left) / rect.width;
   percent = Math.max(0, Math.min(1, percent));
   globalAudio.currentTime = percent * globalAudio.duration;
+}
+
+// 🔴 تابع جدید برای بستن کامل موزیک پلیر
+function closeGlobalPlayer() {
+  globalAudio.pause();
+  globalAudio.currentTime = 0;
+  currentSongIndex = -1;
+  document
+    .getElementById("global-mini-player")
+    .classList.remove("active-player");
+  document.getElementById("global-mini-player").classList.add("hidden-player");
+  // حذف فضای اضافی از پایین صفحه
+  document.body.classList.remove("has-active-player");
 }
 
 // ================= رابط کاربری پلی‌لیست درون مودال =================
@@ -2964,12 +2987,12 @@ function openShrineItem(type) {
   contentBox.style.maxWidth = "700px";
   contentBox.style.padding = "40px";
 
-  // 🔴 در اینجا onclick دکمه به تابع جدید closeShrineOverlay() متصل شد
+  // 🔴 دکمه بازگشت با دستور مستقیم و ضدخطا بازنویسی شد
   contentBox.innerHTML = `
         ${iconHtml}
         <h2 style="color: ${themeColor}; margin-top: 30px; margin-bottom: 25px; font-size: 2.2rem; letter-spacing: 2px; text-shadow: 0 0 15px ${themeColor};">${title}</h2>
         <div id="shrine-typewriter" style="font-size: 1.35rem; line-height: 2.2; min-height: 180px; text-align: justify; text-align-last: center; color: #f8fafc; text-shadow: 0 0 10px rgba(255,255,255,0.4);"></div>
-        <button class="btn-outline" style="margin-top: 45px; border: 2px solid ${themeColor}; color: ${themeColor}; background: rgba(0,0,0,0.5); width: auto; padding: 12px 35px; font-size: 1.15rem; font-weight: bold; border-radius: 12px; box-shadow: 0 0 20px ${themeColor}40; cursor: pointer;" onclick="closeShrineOverlay()">بازگشت به دنیای واقعی</button>
+        <button class="btn-outline" style="margin-top: 45px; border: 2px solid ${themeColor}; color: ${themeColor}; background: rgba(0,0,0,0.5); width: auto; padding: 12px 35px; font-size: 1.15rem; font-weight: bold; border-radius: 12px; box-shadow: 0 0 20px ${themeColor}40; cursor: pointer;" onclick="const ov = document.getElementById('shrine-cinematic-overlay'); if(ov) ov.remove(); if(window.shrineAudio) window.shrineAudio.pause();">بازگشت به دنیای واقعی</button>
     `;
 
   overlay.appendChild(smokeContainer);

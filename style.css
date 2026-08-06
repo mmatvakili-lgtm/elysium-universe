@@ -19,7 +19,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Vazirmatn", sans-serif;
+  font-family: "Yekan Bakh", sans-serif; /* 🔴 فونت تغییر کرد */
   outline: none;
 }
 
@@ -467,11 +467,11 @@ body {
 /* Drawer Menu (اصلاح شده برای موبایل) */
 .sidebar {
   position: fixed;
-  right: 0; /* 🔴 رفع قطعی مشکل بیرون زدن متن منو */
-  transform: translateX(100%); /* منو را به بیرون کادر می‌فرستد */
+  right: 0;
+  transform: translateX(100%);
   top: 0;
   width: 280px;
-  height: 100dvh; /* 🔴 استفاده از dvh (Dynamic Viewport Height) برای دور زدن باگ نوار آدرس موبایل */
+  height: 100dvh;
   background: var(--surface);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -506,20 +506,20 @@ body {
 }
 
 .nav-links {
-  padding: 20px 15px;
+  padding: 20px 10px; /* 🔴 پدینگ اصلاح شد تا متن بیرون نزند */
   flex-grow: 1;
   list-style: none;
-  /* 🔴 این سه خط مشکل اسکرول منو و دکمه خروج را حل می‌کنند */
   overflow-y: auto;
-  scrollbar-width: none; /* مخفی کردن نوار اسکرول در فایرفاکس */
+  scrollbar-width: none;
+  direction: rtl; /* 🔴 اجبار به راست‌چین بودن */
 }
 /* مخفی کردن نوار اسکرول در کروم و سافاری */
 .nav-links::-webkit-scrollbar {
   display: none;
 }
 .nav-item {
-  padding: 15px 20px;
-  margin-bottom: 10px;
+  padding: 12px 15px; /* 🔴 پدینگ داخلی کمتر شد */
+  margin-bottom: 8px;
   border-radius: 14px;
   cursor: pointer;
   color: var(--text-muted);
@@ -1898,25 +1898,42 @@ body.night-owl-theme {
   pointer-events: none;
 }
 
+/* ۴. صورت فلکی اختصاصی (نامحسوس و ظریف) */
 .constellation-star {
   position: absolute;
-  /* 🔴 بزرگ‌تر کردن نامرئیِ ناحیه کلیک (Hitbox) برای لمس راحت‌تر در موبایل */
-  width: 45px;
-  height: 45px;
-  margin-top: -10px; /* تنظیم مرکز */
-  margin-left: -10px;
+  width: 8px; /* 🔴 ستاره بسیار ریز و ظریف شد */
+  height: 8px;
+  margin-top: -4px;
+  margin-left: -4px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 10%, rgba(255, 255, 255, 0) 50%);
+  background: rgba(255, 255, 255, 0.4); /* 🔴 کم‌نورتر شد */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
   cursor: pointer;
   pointer-events: auto !important;
-  z-index: 9999; /* 🔴 آوردن به بالاترین سطح ممکن */
-  animation: twinkle 1.5s infinite alternate;
+  z-index: 50; /* 🔴 زیر منوها قرار می‌گیرد تا مزاحم نباشد */
+  animation: twinkle 3s infinite alternate;
 }
 
-.constellation-star.connected {
+/* 🔴 ساخت یک ناحیه نامرئیِ بزرگ دور ستاره تا لمس آن در موبایل راحت باشد */
+.constellation-star::after {
+  content: "";
+  position: absolute;
+  top: -25px;
+  left: -25px;
+  right: -25px;
+  bottom: -25px;
+}
+
+/*.constellation-star.connected {
   background: radial-gradient(circle, #ffd700 15%, rgba(255, 215, 0, 0) 60%);
   animation: none;
   filter: drop-shadow(0 0 15px #ffd700);
+}*/
+
+.constellation-star.connected {
+  background: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  animation: none;
 }
 
 @keyframes twinkle {
@@ -2138,65 +2155,51 @@ body.night-owl-theme {
 
 /* ================= رفع قطعی مشکلات رسپانسیو و موبایل ================= */
 @media (max-width: 768px) {
-  /* ۱. اصلاح پهنای منوی کناری */
   .sidebar {
-    width: 80%;
-    max-width: 320px;
+    width: 75%;
+    max-width: 300px;
   }
 
-  /* ۲. کوچک‌سازی و دو ستونه کردن کارت‌ها (مثل دیجی‌کالا) */
+  /* 🔴 کوچک شدن هدر و قرارگیری در یک خط */
+  .topbar h1 {
+    font-size: 1.05rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .welcome-banner {
+    min-height: 60px !important;
+    margin-bottom: 20px !important;
+  }
+  #typed-text {
+    font-size: 1.3rem !important;
+    line-height: 1.4 !important;
+    white-space: nowrap;
+  } /* 🔴 قرارگیری در یک خط */
+
   .modules-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
   }
   .module-card {
-    padding: 18px 10px !important;
-    border-radius: 16px !important;
+    padding: 15px 10px !important;
+    border-radius: 14px !important;
   }
   .card-icon {
-    font-size: 1.8rem !important;
+    font-size: 1.6rem !important;
     margin-bottom: 8px !important;
   }
   .module-card h3 {
     font-size: 0.85rem !important;
-    margin-bottom: 4px !important;
-    white-space: nowrap; /* جلوگیری از شکستن خط */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* سه نقطه شدن متن طولانی */
+    text-overflow: ellipsis;
   }
   .module-card p {
     font-size: 0.65rem !important;
     line-height: 1.4 !important;
   }
 
-  /* ۳. کوچک‌سازی هدر، خوش‌آمدگویی و کارت یادآوری */
-  .topbar h1 {
-    font-size: 1.1rem !important;
-  }
-  .welcome-banner {
-    min-height: 80px !important;
-    margin-bottom: 25px !important;
-  }
-  #typed-text {
-    font-size: 1.5rem !important;
-  }
-  .memory-lane-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-    padding: 20px 15px;
-  }
-  .memory-lane-icon {
-    font-size: 2.5rem;
-  }
-  .memory-lane-text h3 {
-    font-size: 1.1rem;
-  }
-  .memory-lane-text p {
-    font-size: 0.8rem;
-  }
-
-  /* ۴. ظریف‌سازی موزه یادگاری‌ها */
   .shrine-gallery {
     gap: 15px !important;
   }
@@ -2223,7 +2226,6 @@ body.night-owl-theme {
     margin-top: 10px !important;
   }
 
-  /* ۵. رفع پرش کادر لاگین */
   .premium-glass-3d {
     padding: 30px 20px !important;
     width: 92% !important;
@@ -2236,4 +2238,9 @@ body.night-owl-theme {
     align-items: flex-start !important;
     padding-top: 5vh !important;
   }
+}
+
+/* 🔴 مدیریت تداخل موزیک پلیر با دکمه‌های پایین صفحه (مثل استودیو) */
+.has-active-player .sections-container {
+  padding-bottom: 90px !important; /* فضا باز می‌شود تا دکمه انتشار زیر پلیر نماند */
 }

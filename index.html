@@ -2,10 +2,15 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <!-- 🔴 جلوگیری از زوم شدن ناخواسته در موبایل -->
     <title>Elysium Universe</title>
+    <!-- 🔴 فونت فوق‌حرفه‌ای و مدرن یکان‌بخ که در اپلیکیشن‌های برتر استفاده می‌شود -->
     <link
-      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css"
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/yekan-bakh@v0.2.0/fonts/yekan-bakh-faNum.css"
       rel="stylesheet"
       type="text/css"
     />
@@ -203,6 +208,21 @@
           <div style="display: flex; align-items: center; gap: 15px">
             <button class="hamburger-btn" onclick="openMenu()">
               <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+            <!-- 🔴 دکمه بازگشت به صفحه اصلی (به صورت پیش‌فرض مخفی) -->
+            <button
+              id="global-back-btn"
+              class="hidden-view"
+              onclick="showSection('home', document.querySelector('.nav-item'))"
+              style="
+                background: none;
+                border: none;
+                color: var(--text-main);
+                font-size: 1.2rem;
+                cursor: pointer;
+              "
+            >
+              <i class="fa-solid fa-arrow-right"></i>
             </button>
             <h1 id="page-title">صفحه اصلی</h1>
           </div>
@@ -1149,6 +1169,20 @@
     <div id="global-mini-player" class="hidden-player" dir="ltr">
       <div class="mini-player-glass">
         <div class="mini-player-info" dir="rtl">
+          <!-- 🔴 دکمه خروج از موزیک پلیر -->
+          <button
+            onclick="closeGlobalPlayer()"
+            style="
+              background: none;
+              border: none;
+              color: #ff4d4d;
+              font-size: 1.2rem;
+              cursor: pointer;
+              margin-left: 10px;
+            "
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
           <i class="fa-solid fa-music text-green music-pulse"></i>
           <span id="mini-player-title">در حال بارگذاری...</span>
         </div>
