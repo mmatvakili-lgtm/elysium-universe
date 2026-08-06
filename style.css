@@ -480,6 +480,9 @@ body {
   display: flex;
   flex-direction: column;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  /* 🔴 اضافه‌شده برای رفعِ قطعیِ بیرون‌زدگی متن در راست‌چین */
+  box-sizing: border-box;
+  padding-right: 0;
 }
 .sidebar.open {
   transform: translateX(0); /* منو را به داخل صفحه برمی‌گرداند */
@@ -646,6 +649,9 @@ body {
   cursor: pointer;
   transition: var(--transition);
   backdrop-filter: var(--glass-blur);
+  /* 🔴 این دو خط اضافه شود تا کارت‌ها سپرِ دفاعی در برابر ستاره‌ها بگیرند */
+  position: relative;
+  z-index: 60;
 }
 .card-icon {
   font-size: 2.8rem;
@@ -1714,6 +1720,9 @@ select#letter-notif-type option {
   gap: 25px;
   cursor: pointer;
   animation: pulseGlowCard 4s infinite alternate;
+  /* 🔴 این دو خط اضافه شود */
+  position: relative;
+  z-index: 60;
 }
 @keyframes pulseGlowCard {
   100% {
@@ -1906,8 +1915,8 @@ body.night-owl-theme {
   margin-top: -4px;
   margin-left: -4px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4); /* 🔴 کم‌نورتر شد */
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.715); /* 🔴 کم‌نورتر شد */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.407);
   cursor: pointer;
   pointer-events: auto !important;
   z-index: 50; /* 🔴 زیر منوها قرار می‌گیرد تا مزاحم نباشد */
@@ -1924,11 +1933,11 @@ body.night-owl-theme {
   bottom: -25px;
 }
 
-/*.constellation-star.connected {
+.constellation-star.connected {
   background: radial-gradient(circle, #ffd700 15%, rgba(255, 215, 0, 0) 60%);
   animation: none;
   filter: drop-shadow(0 0 15px #ffd700);
-}*/
+}
 
 .constellation-star.connected {
   background: #ffd700;
@@ -2303,15 +2312,17 @@ body.night-owl-theme {
   } /* باز کردن فضا برای دکمه انتشار */
 }
 
-/* 🔴 تنظیمات اختصاصی صورت فلکی و ستاره‌ها (کم‌نور و ریز) */
+/* 🔴 تنظیمات اختصاصی صورت فلکی و ستاره‌ها در موبایل */
 .constellation-star {
-  width: 4px !important;
-  height: 4px !important;
-  margin-top: -2px;
-  margin-left: -2px;
-  background: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: none !important;
-  animation: twinkle 5s infinite alternate;
+  width: 5px !important; /* کمی بزرگ‌تر برای دیدِ بهتر */
+  height: 5px !important;
+  margin-top: -2.5px;
+  margin-left: -2.5px;
+  /* 🔴 پررنگ‌تر شدن برای موبایل (از 0.15 رسید به 0.75) */
+  background: rgba(255, 255, 255, 0.55) !important;
+  /* 🔴 افزودن هاله نوری برای موبایل */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3) !important;
+  animation: twinkle 4s infinite alternate;
 }
 .constellation-star::after {
   content: "";
