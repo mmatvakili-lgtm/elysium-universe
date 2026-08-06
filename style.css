@@ -464,13 +464,14 @@ body {
   width: 100%;
 }
 
-/* Drawer Menu */
+/* Drawer Menu (اصلاح شده برای موبایل) */
 .sidebar {
   position: fixed;
-  right: -300px;
+  right: 0; /* 🔴 رفع قطعی مشکل بیرون زدن متن منو */
+  transform: translateX(100%); /* منو را به بیرون کادر می‌فرستد */
   top: 0;
   width: 280px;
-  height: 100vh;
+  height: 100dvh; /* 🔴 استفاده از dvh (Dynamic Viewport Height) برای دور زدن باگ نوار آدرس موبایل */
   background: var(--surface);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -481,7 +482,7 @@ body {
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .sidebar.open {
-  transform: translateX(-300px);
+  transform: translateX(0); /* منو را به داخل صفحه برمی‌گرداند */
 }
 .sidebar-header {
   display: flex;
@@ -2137,32 +2138,102 @@ body.night-owl-theme {
 
 /* ================= رفع قطعی مشکلات رسپانسیو و موبایل ================= */
 @media (max-width: 768px) {
-  /* ۱. رفع مشکل بیرون زدن کادر لاگین */
+  /* ۱. اصلاح پهنای منوی کناری */
+  .sidebar {
+    width: 80%;
+    max-width: 320px;
+  }
+
+  /* ۲. کوچک‌سازی و دو ستونه کردن کارت‌ها (مثل دیجی‌کالا) */
+  .modules-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .module-card {
+    padding: 18px 10px !important;
+    border-radius: 16px !important;
+  }
+  .card-icon {
+    font-size: 1.8rem !important;
+    margin-bottom: 8px !important;
+  }
+  .module-card h3 {
+    font-size: 0.85rem !important;
+    margin-bottom: 4px !important;
+    white-space: nowrap; /* جلوگیری از شکستن خط */
+    overflow: hidden;
+    text-overflow: ellipsis; /* سه نقطه شدن متن طولانی */
+  }
+  .module-card p {
+    font-size: 0.65rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ۳. کوچک‌سازی هدر، خوش‌آمدگویی و کارت یادآوری */
+  .topbar h1 {
+    font-size: 1.1rem !important;
+  }
+  .welcome-banner {
+    min-height: 80px !important;
+    margin-bottom: 25px !important;
+  }
+  #typed-text {
+    font-size: 1.5rem !important;
+  }
+  .memory-lane-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 20px 15px;
+  }
+  .memory-lane-icon {
+    font-size: 2.5rem;
+  }
+  .memory-lane-text h3 {
+    font-size: 1.1rem;
+  }
+  .memory-lane-text p {
+    font-size: 0.8rem;
+  }
+
+  /* ۴. ظریف‌سازی موزه یادگاری‌ها */
+  .shrine-gallery {
+    gap: 15px !important;
+  }
+  .shrine-item {
+    width: 45% !important;
+  }
+  .shrine-icon-wrapper {
+    height: 90px !important;
+    padding-bottom: 10px !important;
+  }
+  .shrine-icon {
+    font-size: 3rem !important;
+  }
+  .emoji-icon {
+    font-size: 3.5rem !important;
+  }
+  .shrine-pedestal {
+    width: 90px !important;
+    height: 90px !important;
+    bottom: 25px !important;
+  }
+  .shrine-item h3 {
+    font-size: 0.8rem !important;
+    margin-top: 10px !important;
+  }
+
+  /* ۵. رفع پرش کادر لاگین */
   .premium-glass-3d {
-    padding: 35px 25px !important;
-    width: 90% !important;
-    max-width: 100% !important;
-    margin: 40px auto !important; /* فاصله از بالا و پایین */
+    padding: 30px 20px !important;
+    width: 92% !important;
+    margin: 30px auto !important;
   }
-
   .login-header h1 {
-    font-size: 2.2rem !important;
+    font-size: 2rem !important;
   }
-
-  .login-ambient-light {
-    width: 250px !important;
-    height: 250px !important;
-  }
-
-  /* ۲. جلوگیری از پرش صفحه هنگام باز شدن کیبورد */
   #login-page {
-    align-items: flex-start !important; /* به جای مرکز، از بالا شروع می‌شود تا کیبورد مزاحم نشود */
+    align-items: flex-start !important;
     padding-top: 5vh !important;
-    min-height: 100% !important;
-  }
-
-  /* ۳. رفع قطعی ستاره‌ها هنگام اسکرول یا تغییر سایز */
-  #particles-js {
-    height: 120vh !important;
   }
 }

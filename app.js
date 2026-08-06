@@ -4,7 +4,7 @@ const BASE_URL = "https://rico6.pythonanywhere.com";
 particlesJS("particles-js", {
   particles: {
     number: { value: 70, density: { enable: true, value_area: 800 } },
-    color: { value: ["#ffffff"] } /* فقط ستاره‌های سفید طبق خواسته شما */,
+    color: { value: ["#eaeac0"] },
     shape: { type: "circle" },
     opacity: {
       value: 1.4,
@@ -19,32 +19,32 @@ particlesJS("particles-js", {
     line_linked: {
       enable: true,
       distance: 140,
-      color: "#ffffff" /* خطوط اتصال هم سفید شدند */,
+      color: "#ffffff",
       opacity: 0.3,
       width: 1,
     },
     move: {
       enable: true,
-      speed: 0.5,
+      speed: 0.6 /* 🔴 سرعت کمی بیشتر شد تا حرکتشان کاملاً محسوس باشد */,
       direction: "none",
       random: true,
+      straight: false,
       out_mode: "out",
     },
   },
   interactivity: {
-    //detect_on: "canvas",
-    detect_on:
-      "window" /* <--- 🔴 شاه‌کلیدِ حل مشکل: تغییر از canvas به window */,
+    detect_on: "window",
     events: {
       onhover: { enable: true, mode: "bubble" },
       onclick: { enable: true, mode: "push" },
+      resize: true /* 🔴 وادار کردن سیستم به ری‌فرش هنگام تغییر حالت به Desktop */,
     },
     modes: {
       bubble: { distance: 180, size: 8, duration: 2, opacity: 1 },
       push: { particles_nb: 3 },
     },
   },
-  retina_detect: true,
+  retina_detect: false /* 🔴 خاموش کردن این گزینه باعث می‌شود در حالت Desktop Site موبایل، بومِ ستاره‌ها فریز نشود */,
 });
 
 // افکت تایپ
@@ -268,10 +268,19 @@ function closeDetail() {
   document
     .getElementById("modal-container")
     .classList.replace("active-view", "hidden-view");
-  // فقط ویدیوها قطع شوند، موزیک گلوبال متوقف نشود!
   document
     .querySelectorAll("#detail-body video")
     .forEach((media) => media.pause());
+
+  // 🔴 دستور خفه‌کنِ قطعی: با بستن هر مودالی، صداهای جادویی قطع می‌شوند
+  if (window.magicAudio) {
+    window.magicAudio.pause();
+    window.magicAudio.currentTime = 0;
+  }
+  if (window.shrineAudio) {
+    window.shrineAudio.pause();
+    window.shrineAudio.currentTime = 0;
+  }
 }
 // ================= نگهبان امنیتی (جلوگیری از دسترسی قبل از لاگین) =================
 function checkAuthGuard() {
@@ -3018,7 +3027,7 @@ function openShrineItem(type) {
 }
 
 // ================= سیستم هوشمند قطع صدای پاپ‌آپ‌ها و لایه‌ها =================
-document.addEventListener("click", function (e) {
+/*document.addEventListener("click", function (e) {
   // ۱. اگر کاربر پاپ‌آپ را با ضربدر یا کلیک روی فضای تاریک بست
   if (
     e.target.closest(".close-modal-btn") ||
@@ -3042,4 +3051,4 @@ function closeShrineOverlay() {
     window.shrineAudio.pause();
     window.shrineAudio.currentTime = 0;
   }
-}
+}*/
