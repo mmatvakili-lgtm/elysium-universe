@@ -2355,171 +2355,131 @@ body.night-owl-theme {
 }
 
 /* =========================================================
-   اصلاح ۱۰۰٪ قطعی و مهندسی کارت‌های نامه (Letters System)
+   جراحی نهایی و قطعی کارت‌های نامه (مبتنی بر ۳ لایه)
    ========================================================= */
-
-/* کانتینر شبکه نامه‌ها */
 #letters-container {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-  gap: 16px !important;
+  gap: 15px !important;
+  padding: 5px !important;
   width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  padding: 0 !important;
-  margin: 0 !important;
 }
 
-/* کارت نامه اصلی */
 .letter-card {
   background: var(--surface) !important;
   border: 1px solid var(--border-light) !important;
   border-radius: 16px !important;
   padding: 16px !important;
-  backdrop-filter: var(--glass-blur) !important;
-  -webkit-backdrop-filter: var(--glass-blur) !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  position: relative !important;
-  overflow: hidden !important;
-  min-width: 0 !important; /* حیاتی برای جلوگیری از بهم ریختگی flex در موبایل */
+  height: 100% !important;
   min-height: 160px !important;
-  transition: var(--transition) !important;
-  cursor: pointer !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  position: relative !important;
 }
 
-.letter-card:hover {
-  background: rgba(255, 140, 66, 0.08) !important;
-  border-color: rgba(255, 140, 66, 0.4) !important;
-  transform: translateY(-2px) !important;
-}
-
-/* هدر کارت: عنوان + مدال/بج ویرایش */
 .letter-card-header {
   display: flex !important;
   justify-content: space-between !important;
   align-items: flex-start !important;
-  gap: 10px !important;
-  width: 100% !important;
-  margin-bottom: 12px !important;
-  min-width: 0 !important;
+  margin-bottom: 10px !important;
 }
 
 .letter-title {
   font-size: 1.05rem !important;
-  font-weight: 700 !important;
   color: var(--orange-main) !important;
-  line-height: 1.4 !important;
   margin: 0 !important;
+  line-height: 1.4 !important;
+  font-weight: bold !important;
   word-break: break-word !important;
-  overflow-wrap: break-word !important;
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
 }
 
-/* بدنه کارت و متن پیش‌نمایش */
 .letter-card-body {
-  flex: 1 1 auto !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  margin-bottom: 12px !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
   overflow: hidden !important;
+  margin-bottom: 12px !important;
 }
 
 .letter-preview {
-  font-size: 0.88rem !important;
+  font-size: 0.9rem !important;
   color: var(--text-muted) !important;
   line-height: 1.6 !important;
   margin: 0 !important;
-  word-break: break-word !important;
-  overflow-wrap: break-word !important;
-  white-space: normal !important;
+  /* 🔴 لاین‌کلمپ حالا به درستی کار می‌کند چون محتوایش خالص است */
   display: -webkit-box !important;
-  -webkit-line-clamp: 3 !important; /* برش دقیق در ۳ خط */
+  -webkit-line-clamp: 3 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  max-height: 4.8em !important;
+  white-space: normal !important;
 }
 
-/* فوتر کارت: تاریخ + وضعیت خوانده شده/جدید */
+/* استایل پیام‌های جدا شده از متن */
+.lock-warning {
+  color: var(--orange-main) !important;
+  font-size: 0.85rem !important;
+  font-weight: bold !important;
+  margin-top: 10px !important;
+}
+.letter-locked .lock-warning {
+  color: #ff4d4d !important;
+}
+
+/* 🔴 ریشه باگ: این خط بلِر، قبلا display: block بود و همه‌چیز را خراب می‌کرد! */
+.blurred-text {
+  filter: blur(4px) !important;
+  opacity: 0.4 !important;
+  user-select: none !important;
+  display: inline !important;
+}
+
 .letter-card-footer {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  gap: 10px !important;
-  width: 100% !important;
+  padding-top: 12px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
   margin-top: auto !important;
-  padding-top: 10px !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-  min-width: 0 !important;
 }
 
 .letter-date {
-  font-size: 0.78rem !important;
+  font-size: 0.8rem !important;
   color: var(--green-main) !important;
-  white-space: nowrap !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 5px !important;
 }
-
-.letter-status {
-  display: flex !important;
-  align-items: center !important;
-  gap: 5px !important;
+.status-read {
   font-size: 0.75rem !important;
-  white-space: nowrap !important;
+  color: var(--green-main) !important;
+  border: 1px solid var(--border-light) !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
+}
+.status-new {
+  font-size: 0.75rem !important;
+  color: #f97b22 !important;
+  border: 1px solid rgba(249, 123, 34, 0.3) !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
 }
 
-/* استایل کپسول‌های قفل شده */
-.letter-card.letter-locked {
-  background: rgba(0, 0, 0, 0.5) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  border-right: 4px solid var(--text-muted) !important;
-}
-
-.letter-card.letter-locked .letter-title {
-  color: var(--text-muted) !important;
-}
-
-/* =========================================================
-   تنظیمات اختصاصی موبایل (صفحه‌های زیر ۷۶۸ پیکسل)
-   ========================================================= */
+/* 🔴 کنترل ۱۰۰٪ ابعاد برای موبایل */
 @media (max-width: 768px) {
-  #section-letters {
-    padding: 15px 12px !important;
-  }
-
   #letters-container {
-    grid-template-columns: 1fr !important; /* اجبار تک‌ستونه در موبایل */
+    grid-template-columns: 1fr !important;
     gap: 12px !important;
-    width: 100% !important;
     padding: 0 !important;
-    margin: 0 !important;
   }
-
   .letter-card {
-    padding: 14px 12px !important;
+    padding: 15px !important;
     border-radius: 14px !important;
-    min-height: 130px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
   }
-
   .letter-title {
     font-size: 0.98rem !important;
   }
-
   .letter-preview {
-    font-size: 0.83rem !important;
-    line-height: 1.5 !important;
-    -webkit-line-clamp: 3 !important;
-    max-height: 4.5em !important;
+    font-size: 0.85rem !important;
+    -webkit-line-clamp: 2 !important;
   }
 }

@@ -1008,6 +1008,7 @@ function loadLetters() {
           let lockMessage = "";
           let unlockTimeStr = "";
 
+          // بررسی وضعیت کپسول زمان
           if (letter.unlock_date && letter.unlock_date.trim() !== "") {
             const unlockTime = new Date(letter.unlock_date).getTime();
             const currentTime = new Date().getTime();
@@ -1031,18 +1032,21 @@ function loadLetters() {
           let previewText = letter.preview;
           let clickAction = `onclick="openLetter(${letter.id})"`;
           let editedBadge = letter.edited_at
-            ? `<span class="edited-badge"><i class="fa-solid fa-pen"></i> ویرایش شده</span>`
+            ? `<span class="edited-badge"><i class="fa-solid fa-pen"></i></span>`
             : "";
+          let lockWarningHtml = ""; // 🔴 جداسازی هوشمندِ پیام قفل از متن اصلی
 
           if (isLocked) {
             cardClass += " letter-locked";
             statusHtml = `<span class="locked-badge"><i class="fa-solid fa-lock"></i> کپسول زمان</span>`;
 
             if (userRole === "admin") {
-              previewText = `<span style="color:var(--text-main);">${letter.preview}</span><br><span style="color:#ff4d4d; font-size:0.85rem; font-weight:bold; margin-top:5px; display:inline-block;"><i class="fa-solid fa-hourglass-half fa-spin"></i> قفل تا: ${unlockTimeStr}</span>`;
-              statusHtml += ` <span style="font-size:0.7rem; color:var(--green-main);">(دسترسی تو باز است)</span>`;
+              previewText = `<span style="color:var(--text-main);">${letter.preview}</span>`;
+              lockWarningHtml = `<div class="lock-warning"><i class="fa-solid fa-hourglass-half fa-spin"></i> قفل برای پارتنر تا: ${unlockTimeStr}</div>`;
+              statusHtml += ` <span style="font-size:0.75rem; color:var(--green-main);">(دسترسی باز)</span>`;
             } else {
-              previewText = `<span class="blurred-text">${letter.preview}</span><span style="color:var(--orange-main); font-size:0.9rem; font-weight:bold;"><i class="fa-solid fa-hourglass-half fa-spin"></i> باز شدن در: ${unlockTimeStr}</span>`;
+              previewText = `<span class="blurred-text">${letter.preview}</span>`;
+              lockWarningHtml = `<div class="lock-warning"><i class="fa-solid fa-hourglass-half fa-spin"></i> باز شدن در: ${unlockTimeStr}</div>`;
               clickAction = `onclick="handleLockedLetter(this, '${lockMessage}')"`;
             }
           } else {
@@ -1050,11 +1054,11 @@ function loadLetters() {
               ? `<span style="font-size: 0.7rem; opacity: 0.7; margin-right:5px;">(${letter.read_at})</span>`
               : "";
             statusHtml = letter.is_read
-              ? `<span style="font-size:0.75rem; color:var(--green-main); border:1px solid var(--border-light); padding:4px 10px; border-radius:12px;">خوانده شده ${readTimeStr}</span>`
-              : `<span style="font-size:0.75rem; color:#F97B22; border:1px solid rgba(249,123,34,0.3); padding:4px 10px; border-radius:12px;">جدید <i class="fa-solid fa-envelope"></i></span>`;
+              ? `<span class="status-read">خوانده شده ${readTimeStr}</span>`
+              : `<span class="status-new">جدید <i class="fa-solid fa-envelope"></i></span>`;
           }
 
-          // در فایل app.js - داخل تابع loadLetters() بخش ساخت کارت‌ها را با این کد دقیق جایگزین کن:
+          // 🔴 تزریق ساختار ۳ لایه و کاملاً ایزوله برای جلوگیری از باگ CSS
           container.innerHTML += `
               <div class="${cardClass}" ${clickAction}>
                   <div class="letter-card-header">
@@ -1063,6 +1067,7 @@ function loadLetters() {
                   </div>
                   <div class="letter-card-body">
                       <p class="letter-preview">${previewText}</p>
+                      ${lockWarningHtml}
                   </div>
                   <div class="letter-card-footer">
                       <span class="letter-date"><i class="fa-regular fa-calendar"></i> ${letter.date}</span>
