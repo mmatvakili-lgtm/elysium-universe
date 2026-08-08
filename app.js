@@ -514,28 +514,48 @@ function loadTimeCenter() {
     });
 }
 
+// =========================================================
+// موتور پردازش هوشمند زمان (تطابق کامل سایت و تلگرام)
+// =========================================================
 function processTimeCenterData(events) {
   let oneTimeEvents = [];
   let annualEvents = [];
   const today = getCurrentJalali();
 
   events.forEach((evt) => {
-    const parts = evt.date.split("/");
+    // 🔴 هوشمندسازی: تبدیل هر نوع جداکننده (- یا .) به اسلش (/)
+    const safeDateStr = evt.date.replace(/-/g, "/").replace(/\./g, "/").trim();
+    const parts = safeDateStr.split("/");
+
     if (parts.length === 3) {
-      // یک‌بار مصرف (دارای سال)
-      const gDate = jalaliToGregorian(parts[0], parts[1], parts[2]);
-      oneTimeEvents.push({ ...evt, gDate: gDate, parts: parts });
+      let y, m, d;
+      // 🔴 هوشمندسازی: تشخیص خودکار جایگاه سال (اگر کاربر برعکس وارد کرد)
+      if (parseInt(parts[0]) > 1300) {
+        y = parseInt(parts[0]);
+        m = parseInt(parts[1]);
+        d = parseInt(parts[2]);
+      } else {
+        d = parseInt(parts[0]);
+        m = parseInt(parts[1]);
+        y = parseInt(parts[2]);
+      }
+      const gDate = jalaliToGregorian(y, m, d);
+      oneTimeEvents.push({
+        ...evt,
+        date: safeDateStr,
+        gDate: gDate,
+        parts: [y, m, d],
+      });
     } else if (parts.length === 2) {
-      // سالانه (بدون سال) - فرمت: MM/DD
       annualEvents.push({
         ...evt,
+        date: safeDateStr,
         jm: parseInt(parts[0]),
         jd: parseInt(parts[1]),
       });
     }
   });
 
-  // سورت کردن تایم‌لاین (از قدیمی به جدید)
   oneTimeEvents.sort((a, b) => a.gDate - b.gDate);
   renderTimeline(oneTimeEvents);
   renderElapsedCounters(oneTimeEvents);
@@ -1505,10 +1525,26 @@ function loadAdminEvents() {
 }
 
 function submitEvent() {
-  const title = document.getElementById("new-event-title").value;
-  const dateStr = document.getElementById("new-event-date").value;
+  let title = document.getElementById("new-event-title").value.trim();
+  let dateStr = document.getElementById("new-event-date").value.trim();
+
   if (!title || !dateStr)
     return alert("لطفاً هم عنوان و هم تاریخ را وارد کنید.");
+
+  // بررسی هوشمند محتوای عددی
+  const hasDigitInDate = /\d/.test(dateStr);
+  const hasDigitInTitle = /\d/.test(title);
+
+  if (!hasDigitInDate && hasDigitInTitle) {
+    // اصلاح خودکار فیلدهای جابه‌جا شده
+    const temp = title;
+    title = dateStr;
+    dateStr = temp;
+  } else if (!hasDigitInDate) {
+    return alert(
+      "❌ فرمت تاریخ نامعتبر است! تاریخ باید شامل اعداد (مثلاً 1402/05/16 یا 08/03) باشد.",
+    );
+  }
 
   const endpoint = editingEventId
     ? `/api/admin/events/${editingEventId}`
@@ -1527,7 +1563,7 @@ function submitEvent() {
         document.getElementById("new-event-date").value = "";
         document.getElementById("btn-save-event").innerText = "ثبت تاریخ";
         editingEventId = null;
-        loadAdminEvents(); // رفرش لیست
+        loadAdminEvents();
       } else alert(d.message);
     });
 }

@@ -856,14 +856,58 @@ body {
   gap: 20px;
   padding-bottom: 20px;
 }
+/* =========================================================
+   اصلاح قطعی کادربندی و رسپانسیو نامه‌ها (Letters)
+   ========================================================= */
 .letter-card {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--surface);
   border: 1px solid var(--border-light);
-  border-right: 4px solid var(--orange-main);
-  padding: 25px;
-  border-radius: 16px;
-  cursor: pointer;
+  border-radius: 18px;
+  padding: 20px;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: flex;
+  flex-direction: column;
+  height: auto !important; /* 🔴 اجازه می‌دهد کادر با محتوا بزرگ شود */
+  min-height: 160px;
+  overflow: hidden; /* 🔴 جلوگیری از بیرون‌زدگی محتوا */
   transition: var(--transition);
+}
+
+.letter-title {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  line-height: 1.4;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+.letter-preview {
+  flex-grow: 1; /* 🔴 هُل دادنِ اطلاعاتِ پایینی (تاریخ و وضعیت) به انتهای کادر */
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 15px;
+  word-break: break-word;
+  white-space: normal !important; /* 🔴 خنثی کردن هرگونه ممانعت از شکستن خط */
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* محدود به دقیقاً ۳ خط */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 4.8em; /* 🔴 سپر دفاعی دوم برای جلوگیری از سرریز متن */
+}
+
+@media (max-width: 768px) {
+  .letter-card {
+    padding: 16px !important;
+    min-height: 140px !important;
+  }
+  .letter-preview {
+    font-size: 0.85rem !important;
+    -webkit-line-clamp: 3 !important;
+    max-height: 4.8em !important;
+  }
 }
 .letter-card:hover {
   background: rgba(255, 140, 66, 0.08);
@@ -874,12 +918,6 @@ body {
   color: var(--orange-main);
   font-size: 1.25rem;
   margin-bottom: 12px;
-}
-.letter-preview {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 15px;
-  line-height: 1.6;
 }
 .letter-date {
   font-size: 0.8rem;
