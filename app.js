@@ -1140,8 +1140,11 @@ function openLetter(id) {
         document.getElementById("book-author").innerText =
           `${l.author} | ${l.date} ${l.edited_at ? `(ویرایش شده)` : ""}`;
 
-        let rawText = l.content.replace(/<br>/g, "\n");
-        currentBookPages = paginateText(rawText, 350);
+        let rawText = l.content.replace(/<br\s*\/?>/gi, "\n");
+
+        // 🔴 هوشمندسازی بر اساس سایز صفحه: در موبایل ظرفیت هر صفحه ۱۵۰ کاراکتر می‌شود تا صفحات بیشتری ساخته شده و متن هرگز بیرون نزند
+        const maxCharsPerPage = window.innerWidth <= 768 ? 150 : 350;
+        currentBookPages = paginateText(rawText, maxCharsPerPage);
         currentPageIndex = 0;
 
         document.querySelector(".book-footer").style.visibility = "visible";
@@ -1210,24 +1213,29 @@ function sendReaction(type, btnElement) {
 }
 
 function paginateText(text, maxLength) {
-  // جایگزینی موقت تگ‌های خط‌شکن برای جلوگیری از بریده شدن آن‌ها
-  const raw = text.replace(/<br\s*\/?>/gi, " [BR] ");
+  const raw = text.replace(/\r\n/g, "\n").replace(/\n/g, " \n ");
   const words = raw.split(" ");
   const pages = [];
   let currentPage = "";
 
   words.forEach((word) => {
+    if (word === "\n") {
+      currentPage += "<br>";
+      return;
+    }
     if ((currentPage + word).length > maxLength && currentPage.trim() !== "") {
-      pages.push(currentPage.replace(/ \[BR\] /g, "<br><br>").trim());
+      pages.push(currentPage.trim());
       currentPage = word + " ";
     } else {
       currentPage += word + " ";
     }
   });
+
   if (currentPage.trim().length > 0) {
-    pages.push(currentPage.replace(/ \[BR\] /g, "<br><br>").trim());
+    pages.push(currentPage.trim());
   }
-  return pages;
+
+  return pages.length > 0 ? pages : [text];
 }
 
 function renderBookPage() {
