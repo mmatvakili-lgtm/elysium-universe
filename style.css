@@ -2558,11 +2558,13 @@ body.night-owl-theme {
     align-items: flex-start !important;
   }
 
-  /* 🔴 کاهش فونت و فاصله خطوط در موبایل */
+  /* 🔴 فونت خوانا و استاندارد برای موبایل به همراه اسکرول نرم داخلی */
   #book-page-text {
-    font-size: 0.95rem !important;
-    line-height: 1.8 !important;
+    font-size: 1.1rem !important;
+    line-height: 2 !important;
     max-height: 100% !important;
+    overflow-y: auto !important; /* اگر متن از کادر بلندتر شد، داخل خودش اسکرول بخورد */
+    padding-right: 5px !important;
   }
 
   .book-footer {
