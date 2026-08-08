@@ -972,7 +972,7 @@ function audioEnded(id) {
   }
 }
 
-// ================= دریافت لیست نامه‌ها (ارتقایافته با منطق کپسول زمان) =================
+// در فایل app.js تابع loadLetters را دقیقاً با این نسخه جایگزین کن
 function loadLetters() {
   const container = document.getElementById("letters-container");
   if (!container) return;
@@ -993,11 +993,10 @@ function loadLetters() {
         }
         container.innerHTML = "";
 
-        // 🔴 ساخت دکمه نوشتن نامه فقط برای پارتنر
         if (userRole === "partner") {
           const partnerBtnHtml = `
                 <div style="text-align: center; margin-bottom: 25px; grid-column: 1 / -1;">
-                    <button class="reverse-capsule-btn" style="width: 100%; font-size: 1.1rem; border-color: var(--orange-main); color: var(--orange-main);" onclick="openPartnerStudio()">
+                    <button class="btn-outline" style="border-color: var(--orange-main); color: var(--orange-main);" onclick="openPartnerStudio()">
                         <i class="fa-solid fa-feather-pointed"></i> نوشتن نامه به آینده (برای متین)...
                     </button>
                 </div>
@@ -1009,7 +1008,6 @@ function loadLetters() {
           let lockMessage = "";
           let unlockTimeStr = "";
 
-          // بررسی قفل بودن کپسول زمان
           if (letter.unlock_date && letter.unlock_date.trim() !== "") {
             const unlockTime = new Date(letter.unlock_date).getTime();
             const currentTime = new Date().getTime();
@@ -1033,7 +1031,7 @@ function loadLetters() {
           let previewText = letter.preview;
           let clickAction = `onclick="openLetter(${letter.id})"`;
           let editedBadge = letter.edited_at
-            ? `<span class="edited-badge"><i class="fa-solid fa-pen"></i> ویرایش شده: ${letter.edited_at}</span>`
+            ? `<span class="edited-badge"><i class="fa-solid fa-pen"></i> ویرایش شده</span>`
             : "";
 
           if (isLocked) {
@@ -1041,37 +1039,34 @@ function loadLetters() {
             statusHtml = `<span class="locked-badge"><i class="fa-solid fa-lock"></i> کپسول زمان</span>`;
 
             if (userRole === "admin") {
-              // ظاهر برای ادمین: پیش‌نمایش واضح، اطلاع‌رسانی قفل
-              previewText = `<span style="color:var(--text-main);">${letter.preview}</span><br><span style="color:#ff4d4d; font-size:0.85rem; font-weight:bold; margin-top:5px; display:inline-block;"><i class="fa-solid fa-hourglass-half fa-spin"></i> قفل برای پارتنر تا: ${unlockTimeStr}</span>`;
+              previewText = `<span style="color:var(--text-main);">${letter.preview}</span><br><span style="color:#ff4d4d; font-size:0.85rem; font-weight:bold; margin-top:5px; display:inline-block;"><i class="fa-solid fa-hourglass-half fa-spin"></i> قفل تا: ${unlockTimeStr}</span>`;
               statusHtml += ` <span style="font-size:0.7rem; color:var(--green-main);">(دسترسی تو باز است)</span>`;
-              clickAction = `onclick="openLetter(${letter.id})"`;
             } else {
-              // ظاهر برای پارتنر: بلور شدن متن و عدم دسترسی
               previewText = `<span class="blurred-text">${letter.preview}</span><span style="color:var(--orange-main); font-size:0.9rem; font-weight:bold;"><i class="fa-solid fa-hourglass-half fa-spin"></i> باز شدن در: ${unlockTimeStr}</span>`;
               clickAction = `onclick="handleLockedLetter(this, '${lockMessage}')"`;
             }
           } else {
             const readTimeStr = letter.read_at
-              ? `<br><span style="font-size: 0.7rem; opacity: 0.7;">${letter.read_at}</span>`
+              ? `<span style="font-size: 0.7rem; opacity: 0.7; margin-right:5px;">(${letter.read_at})</span>`
               : "";
             statusHtml = letter.is_read
-              ? `<span style="font-size:0.75rem; color:var(--green-main); border:1px solid var(--border-light); padding:4px 10px; border-radius:12px;">خوانده شده <i class="fa-solid fa-envelope-open"></i>${readTimeStr}</span>`
+              ? `<span style="font-size:0.75rem; color:var(--green-main); border:1px solid var(--border-light); padding:4px 10px; border-radius:12px;">خوانده شده ${readTimeStr}</span>`
               : `<span style="font-size:0.75rem; color:#F97B22; border:1px solid rgba(249,123,34,0.3); padding:4px 10px; border-radius:12px;">جدید <i class="fa-solid fa-envelope"></i></span>`;
           }
 
           container.innerHTML += `
-            <div class="${cardClass}" ${clickAction}>
-                <div class="letter-card-header">
-                    <h3 class="letter-title">${isLocked ? '<i class="fa-solid fa-lock"></i> ' : ""}${letter.title}</h3>
-                    ${editedBadge}
-                </div>
-                <p class="letter-preview">${previewText}</p>
-                <div class="letter-card-footer">
-                    <span class="letter-date"><i class="fa-regular fa-calendar"></i> ${letter.date}</span>
-                    ${statusHtml}
-                </div>
-            </div>
-        `;
+              <div class="${cardClass}" ${clickAction}>
+                  <div class="letter-card-header">
+                      <h3 class="letter-title">${isLocked ? '<i class="fa-solid fa-lock"></i> ' : ""}${letter.title}</h3>
+                      ${editedBadge}
+                  </div>
+                  <p class="letter-preview">${previewText}</p>
+                  <div class="letter-card-footer">
+                      <span class="letter-date"><i class="fa-regular fa-calendar"></i> ${letter.date}</span>
+                      ${statusHtml}
+                  </div>
+              </div>
+          `;
         });
       }
     });
