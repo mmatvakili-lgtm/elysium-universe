@@ -1142,8 +1142,8 @@ function openLetter(id) {
 
         let rawText = l.content.replace(/<br\s*\/?>/gi, "\n");
 
-        // 🔴 هوشمندسازی بر اساس سایز صفحه: در موبایل ظرفیت هر صفحه ۴۰۰ کاراکتر می‌شود تا صفحات بیشتری ساخته شده و متن هرگز بیرون نزند
-        const maxCharsPerPage = window.innerWidth <= 768 ? 400 : 600;
+        // 🔴 هوشمندسازی بر اساس سایز صفحه: در موبایل ظرفیت هر صفحه ۵۰۰ کاراکتر می‌شود تا صفحات بیشتری ساخته شده و متن هرگز بیرون نزند
+        const maxCharsPerPage = window.innerWidth <= 768 ? 500 : 500;
         currentBookPages = paginateText(rawText, maxCharsPerPage);
         currentPageIndex = 0;
 
