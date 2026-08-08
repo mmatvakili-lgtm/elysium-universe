@@ -2481,27 +2481,119 @@ body.night-owl-theme {
     height: 95px !important;
     margin: 10px auto !important;
   }
+}
 
-  /* تک‌ستونه شدن بی‌نقص کارت‌های نامه‌ها در موبایل */
+/* =========================================================
+   تزریق نهایی: اصلاح ۱۰۰٪ ساختاری و هندسی کادر نامه‌ها
+   این کد تمام کدهای قبلی را بی‌اثر می‌کند
+   ========================================================= */
+#letters-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 16px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+}
+
+.letter-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important; 
+  position: relative !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+.letter-card-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-bottom: 10px !important;
+}
+
+.letter-title {
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  color: var(--text-main) !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  word-break: break-word !important;
+  flex: 1 !important;
+}
+
+.letter-preview {
+  font-size: 0.85rem !important;
+  color: var(--text-muted) !important;
+  line-height: 1.6 !important;
+  margin: 0 0 14px 0 !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-height: 4.8em !important;
+}
+
+.letter-card-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-top: auto !important; 
+  padding-top: 10px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.letter-date {
+  font-size: 0.75rem !important;
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+}
+
+/* 🔴 تنظیمات اختصاصی موبایل برای کادر نامه‌ها */
+@media (max-width: 768px) {
   #letters-container {
-    grid-template-columns: 1fr !important;
-    gap: 15px !important;
+    grid-template-columns: 1fr !important; 
+    gap: 12px !important;
+    width: 100% !important;
     padding: 0 !important;
   }
 
   .letter-card {
-    padding: 16px 14px !important;
-    border-radius: 16px !important;
-    margin-bottom: 5px !important;
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .letter-title {
-    font-size: 1rem !important;
+    font-size: 0.95rem !important;
   }
 
   .letter-preview {
-    font-size: 0.85rem !important;
+    font-size: 0.82rem !important;
     line-height: 1.5 !important;
     -webkit-line-clamp: 3 !important;
+    max-height: 4.5em !important;
   }
 }

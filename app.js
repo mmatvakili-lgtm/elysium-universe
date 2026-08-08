@@ -1060,18 +1060,18 @@ function loadLetters() {
           }
 
           container.innerHTML += `
-                          <div class="${cardClass}" ${clickAction}>
-                              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                  <h3 class="letter-title">${isLocked ? '<i class="fa-solid fa-lock"></i> ' : ""}${letter.title}</h3>
-                                  ${editedBadge}
-                              </div>
-                              <p class="letter-preview" style="margin-top: 10px;">${previewText}</p>
-                              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                                  <span class="letter-date"><i class="fa-regular fa-calendar"></i> ${letter.date}</span>
-                                  ${statusHtml}
-                              </div>
-                          </div>
-                      `;
+            <div class="${cardClass}" ${clickAction}>
+                <div class="letter-card-header">
+                    <h3 class="letter-title">${isLocked ? '<i class="fa-solid fa-lock"></i> ' : ""}${letter.title}</h3>
+                    ${editedBadge}
+                </div>
+                <p class="letter-preview">${previewText}</p>
+                <div class="letter-card-footer">
+                    <span class="letter-date"><i class="fa-regular fa-calendar"></i> ${letter.date}</span>
+                    ${statusHtml}
+                </div>
+            </div>
+        `;
         });
       }
     });
