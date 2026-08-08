@@ -1054,16 +1054,19 @@ function loadLetters() {
               : `<span style="font-size:0.75rem; color:#F97B22; border:1px solid rgba(249,123,34,0.3); padding:4px 10px; border-radius:12px;">جدید <i class="fa-solid fa-envelope"></i></span>`;
           }
 
+          // در فایل app.js - داخل تابع loadLetters() بخش ساخت کارت‌ها را با این کد دقیق جایگزین کن:
           container.innerHTML += `
               <div class="${cardClass}" ${clickAction}>
                   <div class="letter-card-header">
                       <h3 class="letter-title">${isLocked ? '<i class="fa-solid fa-lock"></i> ' : ""}${letter.title}</h3>
                       ${editedBadge}
                   </div>
-                  <p class="letter-preview">${previewText}</p>
+                  <div class="letter-card-body">
+                      <p class="letter-preview">${previewText}</p>
+                  </div>
                   <div class="letter-card-footer">
                       <span class="letter-date"><i class="fa-regular fa-calendar"></i> ${letter.date}</span>
-                      ${statusHtml}
+                      <div class="letter-status">${statusHtml}</div>
                   </div>
               </div>
           `;
