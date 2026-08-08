@@ -2576,29 +2576,71 @@ function checkSkyMirrorWeather() {
 // برای جلوگیری از شلوغی بیش از حد کد فعلی، دکمه‌ای در بخش صندوقچه برای پارتنر ایجاد می‌کنیم که او را به پنل نوشتن می‌برد.
 // این بخش نیازمند آپدیت در index.html (نمایش دکمه نوشتن برای پارتنر) است که در مراحل بعدی می‌توانیم رابط کاربری‌اش را ظریف‌کاری کنیم.
 
-// --- ۴. صورت فلکی اختصاصی (The Constellation Minigame) ---
+// =========================================================
+// صورت فلکی اختصاصی (The Constellation Minigame Engine)
+// =========================================================
 let constellationStars = [];
 let connectedStars = 0;
-const TOTAL_STARS = 4; // مثلاً شکل یک لوزی/قلب با ۴ نقطه
+
+// الگوهای متنوع صورت‌های فلکی برای تنوع در نمایش‌های مجدد
+const CONSTELLATION_PATTERNS = [
+  // الگوی ۱: لوزی کهکشانی
+  [
+    { x: 50, y: 12 },
+    { x: 70, y: 25 },
+    { x: 50, y: 38 },
+    { x: 30, y: 25 },
+  ],
+  // الگوی ۲: ستاره قطبی (مثلث متوازن)
+  [
+    { x: 50, y: 10 },
+    { x: 75, y: 32 },
+    { x: 25, y: 32 },
+    { x: 50, y: 22 },
+  ],
+  // الگوی ۳: تاج آرمانی
+  [
+    { x: 25, y: 20 },
+    { x: 40, y: 32 },
+    { x: 60, y: 32 },
+    { x: 75, y: 20 },
+  ],
+];
+
+// پاکسازی کامل المان‌های صورت فلکی از روی صفحه
+function cleanupConstellationDOM() {
+  document.querySelectorAll(".constellation-star").forEach((el) => el.remove());
+  constellationStars = [];
+  connectedStars = 0;
+
+  const canvas = document.getElementById("constellation-canvas");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
 
 function initConstellationMinigame() {
-  // فقط در صفحه اصلی اجرا شود
   const homeSection = document.getElementById("section-home");
   if (!homeSection) return;
 
-  // 🔴 بررسی زمان آخرین حل شدن (۲۴ ساعت)
-  const lastSolved = localStorage.getItem("elysium_constellation_solved");
-  if (lastSolved && Date.now() - parseInt(lastSolved) < 24 * 60 * 60 * 1000)
-    return;
+  // ۱. اول تمام ستاره‌های قبلی را پاکسازی کن
+  cleanupConstellationDOM();
 
-  // ایجاد یک بوم (Canvas) روی صفحه اصلی برای کشیدن خطوط
+  // ۲. بررسی زمان کول‌داون (۱۲ ساعت استراحت)
+  const COOLDOWN_MS = 12 * 60 * 60 * 1000;
+  const lastSolved = localStorage.getItem("elysium_constellation_solved");
+  if (lastSolved && Date.now() - parseInt(lastSolved) < COOLDOWN_MS) {
+    return; // اگر زمان کول‌داون تمام نشده، صورت فلکی ظاهر نمی‌شود
+  }
+
+  // ایجاد بوم اتصالات
   let canvas = document.getElementById("constellation-canvas");
   if (!canvas) {
     canvas = document.createElement("canvas");
     canvas.id = "constellation-canvas";
     document.body.appendChild(canvas);
 
-    // همگام‌سازی سایز
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -2607,42 +2649,42 @@ function initConstellationMinigame() {
     resizeCanvas();
   }
 
-  // قرار دادن ۴ ستاره نامرئی (کمی پرنورتر) در نقاط تصادفی بالای صفحه
-  for (let i = 0; i < TOTAL_STARS; i++) {
-    const star = document.createElement("div");
-    star.className = "constellation-star hidden-view"; // مخفی در ابتدا
-    // بعد از لاگین و 10 ثانیه چرخیدن تو سایت نمایان بشن تا سوپرایز بشه
-    setTimeout(() => star.classList.remove("hidden-view"), 10000);
+  // انتخاب تصادفی یک الگو از بین صورت‌های فلکی مختلف
+  const patternIndex = Math.floor(
+    Math.random() * CONSTELLATION_PATTERNS.length,
+  );
+  const selectedPattern = CONSTELLATION_PATTERNS[patternIndex];
 
-    // پخش کردن ستاره‌ها در نیمه بالایی صفحه
-    star.style.left = 20 + i * 20 + "%";
-    star.style.top = 15 + Math.random() * 20 + "%";
+  selectedPattern.forEach((pos, i) => {
+    const star = document.createElement("div");
+    star.className = "constellation-star hidden-view";
+
+    // ظاهر شدن نرم ستاره‌ها
+    setTimeout(() => star.classList.remove("hidden-view"), 2500 + i * 400);
+
+    star.style.left = pos.x + "%";
+    star.style.top = pos.y + "%";
     star.dataset.index = i;
 
-    // (بخش داخل حلقه for در تابع initConstellationMinigame)
     star.onclick = function (e) {
-      // 🔴 شاه‌کلید: جلوگیری از انتقال کلیک به پس‌زمینه (تا ستاره جدید ساخته نشود)
       e.stopPropagation();
-      handleStarClick(this, canvas);
+      handleStarClick(this, canvas, selectedPattern.length);
     };
 
     document.body.appendChild(star);
     constellationStars.push(star);
-  }
+  });
 }
 
-function handleStarClick(starElement, canvas) {
-  if (starElement.classList.contains("connected")) return; // قبلاً کلیک شده
+function handleStarClick(starElement, canvas, totalStars) {
+  if (starElement.classList.contains("connected")) return;
 
-  // ستاره را روشن کن
   starElement.classList.add("connected");
 
-  // ذخیره مختصات ستاره کلیک شده
   const rect = starElement.getBoundingClientRect();
   const x = rect.left + rect.width / 2;
   const y = rect.top + rect.height / 2;
 
-  // اگر ستاره اول نیست، از ستاره قبلی به این ستاره خط بکش
   if (connectedStars > 0) {
     const prevStar = constellationStars[connectedStars - 1];
     const prevRect = prevStar.getBoundingClientRect();
@@ -2653,27 +2695,24 @@ function handleStarClick(starElement, canvas) {
     ctx.beginPath();
     ctx.moveTo(prevX, prevY);
     ctx.lineTo(x, y);
-    ctx.strokeStyle = "rgba(255, 215, 0, 0.6)"; // خط نوری طلایی
+    ctx.strokeStyle = "rgba(255, 215, 0, 0.75)";
     ctx.lineWidth = 2;
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 12;
     ctx.shadowColor = "#ffd700";
     ctx.stroke();
   }
 
-  // جابه‌جایی جایگاه این ستاره در آرایه تا ترتیب کشیدن خطوط درست شود
   const currentIndex = parseInt(starElement.dataset.index);
   const temp = constellationStars[connectedStars];
   constellationStars[connectedStars] = starElement;
   constellationStars[currentIndex] = temp;
-  // آپدیت ایندکس‌ها
   constellationStars[connectedStars].dataset.index = connectedStars;
   constellationStars[currentIndex].dataset.index = currentIndex;
 
   connectedStars++;
 
-  // اگر همه ستاره‌ها وصل شدند!
-  if (connectedStars === TOTAL_STARS) {
-    // کشیدن خط از ستاره آخر به ستاره اول برای بستن شکل
+  // تکمیل صورت فلکی
+  if (connectedStars === totalStars) {
     const firstStar = constellationStars[0];
     const fRect = firstStar.getBoundingClientRect();
     const ctx = canvas.getContext("2d");
@@ -2682,14 +2721,16 @@ function handleStarClick(starElement, canvas) {
     ctx.lineTo(fRect.left + fRect.width / 2, fRect.top + fRect.height / 2);
     ctx.stroke();
 
+    // 🔴 ذخیره آنی زمان انجام بدون معطلی
+    localStorage.setItem("elysium_constellation_solved", Date.now().toString());
+
     setTimeout(() => {
       constellationReward();
-    }, 1000);
+    }, 500);
   }
 }
 
 function constellationReward() {
-  // پخش صدای جادویی (متصل به سیستم قطع سراسری)
   try {
     if (window.magicAudio) {
       window.magicAudio.pause();
@@ -2715,21 +2756,11 @@ function constellationReward() {
     `;
   openModal("یک راز در آسمان...", rewardHtml);
 
-  // پاک کردن بوم بعد از اتمام
+  // پاکسازی کامل ستاره‌ها پس از اتمام پاداش
   setTimeout(() => {
-    const canvas = document.getElementById("constellation-canvas");
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    document
-      .querySelectorAll(".constellation-star")
-      .forEach((s) => s.classList.remove("connected"));
-    connectedStars = 0;
-    localStorage.setItem("elysium_constellation_solved", Date.now()); // 🔴 زمان‌بندی مجدد
-  }, 10000);
+    cleanupConstellationDOM();
+  }, 1500);
 }
-
 // ================= فاز ۸.۲: کپسول زمان دوطرفه (با تمام افکت‌های جادویی) =================
 
 function openPartnerStudio() {

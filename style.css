@@ -2341,3 +2341,129 @@ body.night-owl-theme {
   right: -30px;
   bottom: -30px;
 }
+
+/* =========================================================
+   ۱. اصلاح کامل و هماهنگ عکس پروفایل (موبایل و ویندوز)
+   ========================================================= */
+.profile-header-new {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 2px solid var(--green-main);
+  box-shadow: 0 0 15px rgba(124, 144, 112, 0.3);
+  margin: 0 auto;
+}
+
+#user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* =========================================================
+   ۲. اصلاح تخصصی کادربندی نامه‌ها (Letters Grid & Cards)
+   ========================================================= */
+#letters-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.letter-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 18px;
+  padding: 20px;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  transition: var(--transition);
+}
+
+.letter-title {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  line-height: 1.4;
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+
+.letter-preview {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 15px;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* محدودسازی پیش‌نمایش به ۳ خط بدون بیرون زدگی */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   ۳. تنظیمات اختصاصی رسپانسیو موبایل (@media 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+  /* تنظیم موقعیت و فاصله‌های عکس پروفایل در موبایل */
+  .profile-header-new {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 15px !important;
+    margin-top: 15px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .avatar-wrapper {
+    width: 95px !important;
+    height: 95px !important;
+    margin: 10px auto !important;
+  }
+
+  /* تک‌ستونه شدن بی‌نقص کارت‌های نامه‌ها در موبایل */
+  #letters-container {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+    padding: 0 !important;
+  }
+
+  .letter-card {
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .letter-title {
+    font-size: 1rem !important;
+  }
+
+  .letter-preview {
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+    -webkit-line-clamp: 3 !important;
+  }
+}
