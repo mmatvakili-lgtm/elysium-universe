@@ -115,6 +115,7 @@ function attemptLogin() {
         startSoulSyncPing();
         checkSkyMirrorWeather();
         initConstellationMinigame();
+        startDoodleRadar();
       } else {
         errorMsg.innerText = data.message;
       }
@@ -156,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
     startSoulSyncPing();
     checkSkyMirrorWeather();
     initConstellationMinigame();
+        startDoodleRadar();
   }
 });
 
@@ -170,6 +172,7 @@ function logout() {
   document.getElementById("username").value = "";
   document.getElementById("password").value = "";
   document.getElementById("admin-menu").classList.add("hidden-view");
+  stopDoodleRadar();
   closeMenu();
 }
 
@@ -235,6 +238,7 @@ function showSection(sectionId, element, isBack = false) {
     timecenter: "مرکز زمان ⏳",
     vault: "گاوصندوق رازها 🔐",
     echo: "پژواک کهکشان 📡",
+    doodle: "بوم دونفره 🎨",
     shrine: "موزه یادگاری‌های مقدس 🏛️",
   };
   document.getElementById("page-title").innerText = titles[sectionId] || "";
@@ -244,6 +248,8 @@ function showSection(sectionId, element, isBack = false) {
   if (sectionId === "timecenter") loadTimeCenter();
   if (sectionId === "vault") loadVaultQuestion();
   if (sectionId === "home") loadMemoryLane();
+  if (sectionId === "doodle") initDoodle();
+  if (sectionId === "home") loadDoodleHome();
   if (sectionId === "profile") loadProfileData(); // 🔴 لود اطلاعات پروفایل
 
   closeMenu();
@@ -3341,4 +3347,429 @@ function saveProfileInfo() {
         2000,
       );
     });
+}
+
+// ================= فاز ۹: بوم دونفره (Elysium Doodle) =================
+const DOODLE_COLORS = ["#f97b22", "#fee8b0", "#ff6b9d", "#6bc7ff", "#7c9070", "#ffffff"];
+const DOODLE_BG = "#12141c";
+const DOODLE_W = 800;
+const DOODLE_H = 1000;
+let doodleCanvas = null;
+let doodleCtx = null;
+let doodleStrokes = [];
+let doodleCur = null;
+let doodleColor = DOODLE_COLORS[0];
+let doodleEraser = false;
+let doodleTab = "draw";
+let doodleFile = null;
+let doodleSending = false;
+let doodleHistory = [];
+let doodleRadar = null;
+let doodleQueue = [];
+let doodleKnown = new Set();
+let doodleShowing = null;
+
+function $d(id) {
+  return document.getElementById(id);
+}
+function doodleUser() {
+  return localStorage.getItem("elysium_user");
+}
+function doodleName(u) {
+  return u === "matin" ? "متین" : "مطهره";
+}
+
+// ---------- بوم نقاشی ----------
+function initDoodle() {
+  if (doodleCanvas) return;
+  doodleCanvas = $d("doodle-canvas");
+  doodleCanvas.width = DOODLE_W;
+  doodleCanvas.height = DOODLE_H;
+  doodleCtx = doodleCanvas.getContext("2d");
+  $d("doodle-colors").innerHTML = DOODLE_COLORS.map(
+    (c, i) =>
+      `<span class="doodle-swatch${i === 0 ? " active" : ""}" style="background:${c}" onclick="setDoodleColor('${c}', this)"></span>`,
+  ).join("");
+  doodleCanvas.addEventListener("pointerdown", doodleDown);
+  doodleCanvas.addEventListener("pointermove", doodleMove);
+  ["pointerup", "pointercancel", "pointerleave"].forEach((ev) =>
+    doodleCanvas.addEventListener(ev, doodleUp),
+  );
+  redrawDoodle();
+}
+
+function doodlePos(e) {
+  const r = doodleCanvas.getBoundingClientRect();
+  return {
+    x: ((e.clientX - r.left) * DOODLE_W) / r.width,
+    y: ((e.clientY - r.top) * DOODLE_H) / r.height,
+  };
+}
+
+function doodleStyle(s) {
+  doodleCtx.strokeStyle = s.color;
+  doodleCtx.fillStyle = s.color;
+  doodleCtx.lineWidth = s.size;
+  doodleCtx.lineCap = "round";
+  doodleCtx.lineJoin = "round";
+}
+
+function drawDoodleStroke(s) {
+  doodleStyle(s);
+  doodleCtx.beginPath();
+  if (s.pts.length === 1) {
+    doodleCtx.arc(s.pts[0].x, s.pts[0].y, s.size / 2, 0, Math.PI * 2);
+    doodleCtx.fill();
+    return;
+  }
+  doodleCtx.moveTo(s.pts[0].x, s.pts[0].y);
+  s.pts.slice(1).forEach((p) => doodleCtx.lineTo(p.x, p.y));
+  doodleCtx.stroke();
+}
+
+function redrawDoodle() {
+  doodleCtx.fillStyle = DOODLE_BG;
+  doodleCtx.fillRect(0, 0, DOODLE_W, DOODLE_H);
+  doodleStrokes.forEach(drawDoodleStroke);
+}
+
+function doodleDown(e) {
+  e.preventDefault();
+  doodleCanvas.setPointerCapture(e.pointerId);
+  doodleCur = {
+    color: doodleEraser ? DOODLE_BG : doodleColor,
+    size: +$d("doodle-size").value,
+    pts: [doodlePos(e)],
+  };
+  doodleStrokes.push(doodleCur);
+  drawDoodleStroke(doodleCur);
+}
+
+function doodleMove(e) {
+  if (!doodleCur) return;
+  e.preventDefault();
+  const a = doodleCur.pts[doodleCur.pts.length - 1];
+  const b = doodlePos(e);
+  doodleCur.pts.push(b);
+  doodleStyle(doodleCur);
+  doodleCtx.beginPath();
+  doodleCtx.moveTo(a.x, a.y);
+  doodleCtx.lineTo(b.x, b.y);
+  doodleCtx.stroke();
+}
+
+function doodleUp() {
+  doodleCur = null;
+}
+
+function setDoodleColor(c, el) {
+  doodleColor = c;
+  doodleEraser = false;
+  $d("doodle-eraser-btn").classList.remove("active");
+  document.querySelectorAll(".doodle-swatch").forEach((s) => s.classList.remove("active"));
+  el.classList.add("active");
+}
+
+function toggleDoodleEraser() {
+  doodleEraser = !doodleEraser;
+  $d("doodle-eraser-btn").classList.toggle("active", doodleEraser);
+}
+
+function undoDoodle() {
+  doodleStrokes.pop();
+  redrawDoodle();
+}
+
+function clearDoodle() {
+  if (doodleStrokes.length && confirm("کل نقاشی پاک بشه؟")) {
+    doodleStrokes = [];
+    redrawDoodle();
+  }
+}
+
+// ---------- تب‌ها و انتخاب فایل ----------
+function doodleMode(tab, btn) {
+  doodleTab = tab;
+  document.querySelectorAll("#section-doodle .admin-tab").forEach((b) => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  $d("doodle-draw-pane").style.display = tab === "draw" ? "block" : "none";
+  $d("doodle-media-pane").style.display = tab === "media" ? "block" : "none";
+  $d("doodle-history-pane").style.display = tab === "history" ? "block" : "none";
+  $d("doodle-send-bar").style.display = tab === "history" ? "none" : "block";
+  $d("doodle-msg").innerText = "";
+  if (tab === "history") loadDoodleHistory();
+}
+
+function doodlePickFile(input) {
+  const f = input.files[0];
+  if (!f) return;
+  const isVideo = f.type.startsWith("video/");
+  if (!isVideo && !f.type.startsWith("image/")) {
+    $d("doodle-msg").innerText = "فقط عکس یا ویدیو.";
+    return;
+  }
+  if (isVideo && f.size > 25 * 1024 * 1024) {
+    $d("doodle-msg").innerText = "ویدیو باید کمتر از ۲۵ مگابایت باشه.";
+    input.value = "";
+    return;
+  }
+  doodleFile = f;
+  $d("doodle-msg").innerText = "";
+  const url = URL.createObjectURL(f);
+  $d("doodle-preview").innerHTML = isVideo
+    ? `<video src="${url}" controls playsinline muted></video>`
+    : `<img src="${url}">`;
+}
+
+// کوچک کردن عکس‌های سنگین گوشی قبل از آپلود
+function doodleShrinkImage(file) {
+  return new Promise((resolve) => {
+    if (file.type === "image/gif" || file.size < 1.5 * 1024 * 1024) return resolve(file);
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * k);
+      c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob((b) => {
+        URL.revokeObjectURL(url);
+        resolve(b || file);
+      }, "image/jpeg", 0.85);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+}
+
+// ---------- ارسال ----------
+async function sendDoodle() {
+  if (doodleSending) return;
+  const me = doodleUser();
+  if (me !== "matin" && me !== "moti") {
+    $d("doodle-msg").innerText = "نشست ورود تموم شده؛ یک بار خارج شو و دوباره وارد شو.";
+    return;
+  }
+  const msg = $d("doodle-msg");
+  const btn = $d("doodle-send-btn");
+  const fd = new FormData();
+  fd.append("username", doodleUser());
+  fd.append("caption", $d("doodle-caption").value.trim());
+
+  if (doodleTab === "draw") {
+    if (!doodleStrokes.length) {
+      msg.innerText = "اول یه چیزی بکش 🎨";
+      return;
+    }
+    const blob = await new Promise((r) => doodleCanvas.toBlob(r, "image/png"));
+    fd.append("kind", "drawing");
+    fd.append("file", blob, "doodle.png");
+  } else {
+    if (!doodleFile) {
+      msg.innerText = "اول یه عکس یا ویدیو انتخاب کن 📎";
+      return;
+    }
+    const isVideo = doodleFile.type.startsWith("video/");
+    const out = isVideo ? doodleFile : await doodleShrinkImage(doodleFile);
+    fd.append("kind", isVideo ? "video" : "image");
+    fd.append("file", out, out.name || "photo.jpg");
+  }
+
+  doodleSending = true;
+  btn.disabled = true;
+  msg.innerText = "در حال فرستادن... ✨";
+  try {
+    const res = await fetch(BASE_URL + "/api/doodle/send", { method: "POST", body: fd });
+    if (res.status === 413) throw new Error("حجم فایل زیاده.");
+    let data = null;
+    try {
+      data = await res.json();
+    } catch (_) {
+      throw new Error(res.status === 404
+        ? "سرور هنوز آپدیت نشده (کد 404). app.py جدید رو روی PythonAnywhere ذخیره و Reload کن."
+        : "سرور پاسخ نامعتبر داد (کد " + res.status + "). لاگ‌های PythonAnywhere رو ببین.");
+    }
+    if (data.status !== "success") throw new Error(data.message || "خطا");
+    msg.innerText = "فرستاده شد 💌";
+    $d("doodle-caption").value = "";
+    doodleStrokes = [];
+    redrawDoodle();
+    doodleFile = null;
+    $d("doodle-file").value = "";
+    $d("doodle-preview").innerHTML = "";
+  } catch (e) {
+    msg.innerText = "❌ " + (e.message === "Failed to fetch" ? "اتصال به سرور برقرار نشد." : e.message);
+  }
+  doodleSending = false;
+  btn.disabled = false;
+}
+
+// ---------- دریافت زنده (رادار) ----------
+function startDoodleRadar() {
+  if (doodleRadar) return;
+  doodleRadar = setInterval(checkDoodleInbox, 6000);
+  checkDoodleInbox();
+  loadDoodleHome();
+}
+
+function stopDoodleRadar() {
+  clearInterval(doodleRadar);
+  doodleRadar = null;
+  doodleQueue = [];
+  doodleShowing = null;
+  doodleKnown = new Set();
+  const ov = $d("doodle-incoming");
+  if (ov) ov.classList.add("hidden-view");
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && doodleRadar) checkDoodleInbox();
+});
+
+function checkDoodleInbox() {
+  const user = doodleUser();
+  if (!user) return;
+  fetch(`${BASE_URL}/api/doodle/inbox?username=${encodeURIComponent(user)}`)
+    .then((r) => r.json())
+    .then((d) => {
+      if (d.status !== "success") return;
+      let fresh = false;
+      d.data.forEach((it) => {
+        if (!doodleKnown.has(it.id)) {
+          doodleKnown.add(it.id);
+          doodleQueue.push(it);
+          fresh = true;
+        }
+      });
+      if (fresh) loadDoodleHome();
+      if (!doodleShowing && doodleQueue.length) showNextDoodle();
+    })
+    .catch(() => {});
+}
+
+function showNextDoodle() {
+  const it = doodleQueue.shift();
+  if (it) openDoodleViewer(it, true);
+}
+
+function openDoodleViewer(it, live) {
+  const fromMe = it.sender === doodleUser();
+  doodleShowing = live ? it : null;
+  $d("doodle-incoming-from").innerText = live
+    ? `🎨 ${doodleName(it.sender)} برات فرستاد`
+    : fromMe
+      ? "ارسال‌شده توسط تو"
+      : `از طرف ${doodleName(it.sender)}`;
+  const src = BASE_URL + it.url;
+  $d("doodle-incoming-media").innerHTML =
+    it.kind === "video"
+      ? `<video src="${src}" controls autoplay playsinline loop></video>`
+      : `<img src="${src}">`;
+  $d("doodle-incoming-caption").innerText = it.caption || "";
+  $d("doodle-reply-btn").style.display = fromMe ? "none" : "";
+  $d("doodle-incoming").classList.remove("hidden-view");
+  if (live && navigator.vibrate) navigator.vibrate([80, 40, 80]);
+}
+
+function closeDoodleViewer(reply) {
+  const it = doodleShowing;
+  doodleShowing = null;
+  $d("doodle-incoming-media").innerHTML = "";
+  if (it) {
+    fetch(BASE_URL + "/api/doodle/seen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: doodleUser(), id: it.id }),
+    })
+      .then(() => loadDoodleHome())
+      .catch(() => {});
+  }
+  if (doodleQueue.length) return showNextDoodle();
+  $d("doodle-incoming").classList.add("hidden-view");
+  if (reply) {
+    showSection("doodle", null);
+    doodleMode("draw", document.querySelector("#section-doodle .admin-tab"));
+  }
+}
+
+// ---------- تاریخچه ----------
+function loadDoodleHistory() {
+  const box = $d("doodle-history-list");
+  const me = doodleUser();
+  box.innerHTML = "<p class='text-muted'>در حال بارگذاری...</p>";
+  fetch(`${BASE_URL}/api/doodle/history?username=${encodeURIComponent(me)}`)
+    .then((r) => r.json())
+    .then((d) => {
+      if (d.status !== "success" || !d.data.length) {
+        box.innerHTML = "<p class='text-muted'>هنوز چیزی ردوبدل نشده... اولین نقاشی رو بفرست 🎨</p>";
+        return;
+      }
+      doodleHistory = d.data;
+      box.innerHTML =
+        '<div class="doodle-history-grid">' +
+        d.data
+          .map((it, i) => {
+            const mine = it.sender === me;
+            const src = BASE_URL + it.url;
+            const thumb =
+              it.kind === "video"
+                ? `<video src="${src}#t=0.1" preload="metadata" muted playsinline></video>`
+                : `<img src="${src}" loading="lazy">`;
+            const status = mine ? (it.seen_at ? "دیده شد ✓✓" : "ارسال شد ✓") : "دریافتی 💌";
+            const del = mine
+              ? `<button class="doodle-del" onclick="deleteDoodle(${it.id}, event)"><i class="fa-solid fa-trash"></i></button>`
+              : "";
+            return `<div class="doodle-card" onclick="openDoodleViewer(doodleHistory[${i}], false)">${thumb}<small>${status}</small>${del}</div>`;
+          })
+          .join("") +
+        "</div>";
+    })
+    .catch(() => (box.innerHTML = "<p class='text-muted'>❌ اتصال برقرار نشد.</p>"));
+}
+
+function deleteDoodle(id, ev) {
+  ev.stopPropagation();
+  if (!confirm("این مورد برای همیشه پاک بشه؟")) return;
+  fetch(`${BASE_URL}/api/doodle/${id}?username=${encodeURIComponent(doodleUser())}`, { method: "DELETE" })
+    .then(() => loadDoodleHistory())
+    .catch(() => {});
+}
+
+// ---------- کارت صفحه‌ی اصلی: آخرین چیزی که او فرستاده ----------
+let doodleHomeLastId = null;
+
+function loadDoodleHome() {
+  const box = $d("doodle-home-card");
+  const me = doodleUser();
+  if (!box || !me) return;
+  fetch(`${BASE_URL}/api/doodle/latest?username=${encodeURIComponent(me)}`)
+    .then((r) => r.json())
+    .then((d) => {
+      const it = d.status === "success" ? d.data : null;
+      if (!it) {
+        box.innerHTML = "";
+        return;
+      }
+      const src = BASE_URL + it.url;
+      const thumb =
+        it.kind === "video"
+          ? `<video src="${src}#t=0.1" preload="metadata" muted playsinline></video>`
+          : `<img src="${src}">`;
+      box.innerHTML = `<div class="doodle-home glass-panel${it.seen_at ? "" : " is-new"}">
+          <div class="doodle-home-thumb">${thumb}</div>
+          <div class="doodle-home-info">
+            <h4 class="text-orange"><i class="fa-solid fa-paintbrush"></i> از طرف ${doodleName(it.sender)}${it.seen_at ? "" : ' <span class="doodle-new-badge">جدید</span>'}</h4>
+            <p class="doodle-home-caption"></p>
+            <small class="text-muted">${(it.created_at || "").slice(0, 16)}</small>
+          </div>
+        </div>`;
+      box.querySelector(".doodle-home-caption").textContent = it.caption || "";
+      box.querySelector(".doodle-home").onclick = () => openDoodleViewer(it, false);
+      doodleHomeLastId = it.id;
+    })
+    .catch(() => {});
 }

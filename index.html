@@ -170,6 +170,13 @@
             <i class="fa-solid fa-place-of-worship"></i>
             <span>موزه یادگاری‌ها</span>
           </li>
+          <li
+            class="nav-item"
+            id="nav-doodle-btn"
+            onclick="showSection('doodle', this)"
+          >
+            <i class="fa-solid fa-paintbrush"></i> <span>بوم دونفره</span>
+          </li>
           <li class="nav-item" onclick="showSection('profile', this)">
             <i class="fa-solid fa-user-gear"></i> <span>تنظیمات پروفایل</span>
           </li>
@@ -264,6 +271,8 @@
               <span id="typed-text"></span>
             </div>
             <!-- کادر هوشمند تونل زمان (توسط جاوااسکریپت پر می‌شود) -->
+            <!-- کارت زنده‌ی آخرین نقاشی/مدیای پارتنر -->
+            <div id="doodle-home-card"></div>
             <div id="memory-lane-container"></div>
             <div class="modules-grid">
               <div
@@ -301,6 +310,16 @@
                 </div>
                 <h3>صندوقچه خاطرات</h3>
                 <p>قاب‌های ماندگار ما</p>
+              </div>
+              <div
+                class="module-card border-orange"
+                onclick="showSection('doodle', document.getElementById('nav-doodle-btn'))"
+              >
+                <div class="card-icon text-orange">
+                  <i class="fa-solid fa-paintbrush"></i>
+                </div>
+                <h3>بوم دونفره</h3>
+                <p>نقاشی و عکس برای او...</p>
               </div>
               <!-- تغییر onclick از showRandomSong به showSongsLibrary -->
               <div
@@ -1058,6 +1077,61 @@
           </section>
 
           <!-- بخش ۸: پژواک کهکشان (ارسال پیام) -->
+          <!-- بخش: بوم دونفره (Elysium Doodle) -->
+          <section id="section-doodle" class="app-section hidden-section">
+            <div class="doodle-wrap glass-panel">
+              <div class="admin-tabs">
+                <button class="admin-tab active" onclick="doodleMode('draw', this)">
+                  <i class="fa-solid fa-pen-nib"></i> نقاشی
+                </button>
+                <button class="admin-tab" onclick="doodleMode('media', this)">
+                  <i class="fa-solid fa-photo-film"></i> عکس / ویدیو
+                </button>
+                <button class="admin-tab" onclick="doodleMode('history', this)">
+                  <i class="fa-solid fa-clock-rotate-left"></i> تاریخچه
+                </button>
+              </div>
+
+              <div id="doodle-draw-pane">
+                <div class="doodle-toolbar">
+                  <div id="doodle-colors" class="doodle-colors"></div>
+                  <input type="range" id="doodle-size" min="3" max="50" value="10" />
+                  <button id="doodle-eraser-btn" class="doodle-tool" onclick="toggleDoodleEraser()" title="پاک‌کن">
+                    <i class="fa-solid fa-eraser"></i>
+                  </button>
+                  <button class="doodle-tool" onclick="undoDoodle()" title="برگرداندن">
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                  <button class="doodle-tool" onclick="clearDoodle()" title="پاک کردن همه">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+                <canvas id="doodle-canvas"></canvas>
+              </div>
+
+              <div id="doodle-media-pane" style="display: none">
+                <label class="doodle-drop" for="doodle-file">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span>انتخاب عکس یا ویدیو (ویدیو تا ۲۵ مگابایت)</span>
+                </label>
+                <input type="file" id="doodle-file" accept="image/*,video/*" hidden onchange="doodlePickFile(this)" />
+                <div id="doodle-preview" class="doodle-preview"></div>
+              </div>
+
+              <div id="doodle-history-pane" style="display: none">
+                <div id="doodle-history-list"></div>
+              </div>
+
+              <div id="doodle-send-bar">
+                <input id="doodle-caption" class="doodle-caption" maxlength="200" placeholder="یه جمله‌ی کوچولو کنارش بنویس... (اختیاری)" />
+                <button id="doodle-send-btn" class="btn-gradient" onclick="sendDoodle()">
+                  <i class="fa-solid fa-paper-plane"></i> بفرست روی صفحه‌ی او
+                </button>
+              </div>
+              <p id="doodle-msg" class="text-muted" style="margin-top: 12px"></p>
+            </div>
+          </section>
+
           <section id="section-echo" class="app-section hidden-section">
             <div class="vault-container glass-panel" style="max-width: 700px">
               <i
@@ -1153,6 +1227,23 @@
           </section>
         </div>
       </main>
+    </div>
+
+    <!-- نمایش زنده‌ی نقاشی/مدیای دریافتی از پارتنر -->
+    <div id="doodle-incoming" class="hidden-view">
+      <div class="doodle-incoming-card glass-panel">
+        <h3 id="doodle-incoming-from" class="text-orange"></h3>
+        <div id="doodle-incoming-media"></div>
+        <p id="doodle-incoming-caption"></p>
+        <div class="doodle-incoming-actions">
+          <button class="btn-gradient" onclick="closeDoodleViewer(false)">
+            <i class="fa-solid fa-heart"></i> دیدم
+          </button>
+          <button id="doodle-reply-btn" class="btn-outline" onclick="closeDoodleViewer(true)">
+            <i class="fa-solid fa-paintbrush"></i> جواب بده
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- ================= لایه Overlay و Modal (طراحی جدید) ================= -->
